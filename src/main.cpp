@@ -12,7 +12,12 @@ int warm_up;
 
 void setup()
 {
+  // Solenoid Pins
+  pinMode(SOLENOID_VALVE_OUTPUT_PIN_1, OUTPUT);
+
+  // PIR PINS
   pinMode(PIR_SENSOR_OUTPUT_PIN, INPUT);
+
   Serial.begin(115200); // initialize serial
   Serial.println("Waiting For Power On Warm Up");
   delay(20000); /* Power On Warm Up Delay */
@@ -21,23 +26,37 @@ void setup()
 
 void loop()
 {
-  int sensor_output;
-  sensor_output = digitalRead(PIR_SENSOR_OUTPUT_PIN);
-  if (sensor_output == LOW)
-  {
-    if (warm_up == 1)
-    {
-      Serial.print("Warming Up\n\n");
-      warm_up = 0;
-      delay(2000);
-    }
-    Serial.print("No object in sight\n\n");
-    delay(1000);
-  }
-  else
-  {
-    Serial.print("Object detected\n\n");
-    warm_up = 1;
-    delay(1000);
-  }
+  // SOLENOID CODE BELOW
+
+  // Turn on solenoid valve on pin 1
+  digitalWrite(SOLENOID_VALVE_OUTPUT_PIN_1, HIGH);
+  Serial.println("Solenoid valve on");
+  delay(5000); // Wait for 5 seconds
+
+  // Turn off solenoid valve on pin 1
+  digitalWrite(SOLENOID_VALVE_OUTPUT_PIN_1, LOW);
+  Serial.println("Solenoid valve off");
+  delay(5000); // Wait for another 5 seconds
+
+  // PIR CODE BELOW
+
+  // int sensor_output;
+  // sensor_output = digitalRead(PIR_SENSOR_OUTPUT_PIN);
+  // if (sensor_output == LOW)
+  // {
+  //   if (warm_up == 1)
+  //   {
+  //     Serial.print("Warming Up\n\n");
+  //     warm_up = 0;
+  //     delay(2000);
+  //   }
+  //   Serial.print("No object in sight\n\n");
+  //   delay(1000);
+  // }
+  // else
+  // {
+  //   Serial.print("Object detected\n\n");
+  //   warm_up = 1;
+  //   delay(1000);
+  // }
 }
