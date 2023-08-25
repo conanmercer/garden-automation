@@ -19,24 +19,28 @@ void setup()
   pinMode(PIR_SENSOR_OUTPUT_PIN, INPUT);
 
   Serial.begin(115200); // initialize serial
-  Serial.println("Waiting For Power On Warm Up");
-  delay(20000); /* Power On Warm Up Delay */
-  Serial.println("Ready!");
+  // Serial.println("Waiting For Power On Warm Up");
+  // delay(20000); /* Power On Warm Up Delay */
+  // Serial.println("Ready!");
+}
+
+void controlSolenoidValve()
+{
+  // Turn on solenoid valve on pin 1
+  digitalWrite(SOLENOID_VALVE_OUTPUT_PIN_1, HIGH);
+
+  delay(5000); // Optional delay for stability
+
+  // Turn off solenoid valve on pin 1
+  digitalWrite(SOLENOID_VALVE_OUTPUT_PIN_1, LOW);
 }
 
 void loop()
 {
-  // SOLENOID CODE BELOW
 
-  // Turn on solenoid valve on pin 1
-  digitalWrite(SOLENOID_VALVE_OUTPUT_PIN_1, HIGH);
-  Serial.println("Solenoid valve on");
+  controlSolenoidValve();
+  Serial.print("Code Activated");
   delay(5000); // Wait for 5 seconds
-
-  // Turn off solenoid valve on pin 1
-  digitalWrite(SOLENOID_VALVE_OUTPUT_PIN_1, LOW);
-  Serial.println("Solenoid valve off");
-  delay(5000); // Wait for another 5 seconds
 
   // PIR CODE BELOW
 
