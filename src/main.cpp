@@ -1,6 +1,6 @@
 #include <Arduino.h>
 
-const int PIR_SENSOR_OUTPUT_PIN = 26; /* PIR sensor O/P pin */
+// const int PIR_SENSOR_OUTPUT_PIN = 26; /* PIR sensor O/P pin */
 
 const int SOLENOID_VALVE_OUTPUT_PIN_1 = 4;  /* Solenoid valve connected to GPIO pin 4 connected to Relay pin IN_1 */
 const int SOLENOID_VALVE_OUTPUT_PIN_2 = 5;  /* Solenoid valve connected to GPIO pin 5 connected to Relay pin IN_2 */
@@ -20,9 +20,9 @@ void setup()
   pinMode(SOLENOID_VALVE_OUTPUT_PIN_5, OUTPUT);
 
   // PIR PINS
-  pinMode(PIR_SENSOR_OUTPUT_PIN, INPUT);
+  // pinMode(PIR_SENSOR_OUTPUT_PIN, INPUT);
 
-  Serial.begin(115200); // initialize serial
+  // Serial.begin(115200); // initialize serial
   // Serial.println("Waiting For Power On Warm Up");
   // delay(20000); /* Power On Warm Up Delay */
   // Serial.println("Ready!");
@@ -31,37 +31,58 @@ void setup()
 void controlSolenoidValve()
 {
   // Turn on each solenoid valve with 3 second delays between each actuation
-  digitalWrite(SOLENOID_VALVE_OUTPUT_PIN_1, HIGH);
-  delay(3000); // Delay
-  digitalWrite(SOLENOID_VALVE_OUTPUT_PIN_2, HIGH);
-  delay(3000); // Delay
-  digitalWrite(SOLENOID_VALVE_OUTPUT_PIN_3, HIGH);
-  delay(3000); // Delay
-  digitalWrite(SOLENOID_VALVE_OUTPUT_PIN_4, HIGH);
-  delay(3000); // Delay
-  digitalWrite(SOLENOID_VALVE_OUTPUT_PIN_5, HIGH);
-
-  delay(10000); // Delay everything for 10 seconds
-
-  // Turn off each solenoid valve with 3 second delays between each actuation
   digitalWrite(SOLENOID_VALVE_OUTPUT_PIN_1, LOW);
-  delay(3000); // Delay
-  digitalWrite(SOLENOID_VALVE_OUTPUT_PIN_2, LOW);
-  delay(3000); // Delay
-  digitalWrite(SOLENOID_VALVE_OUTPUT_PIN_3, LOW);
-  delay(3000); // Delay
-  digitalWrite(SOLENOID_VALVE_OUTPUT_PIN_4, LOW);
-  delay(3000); // Delay
-  digitalWrite(SOLENOID_VALVE_OUTPUT_PIN_5, LOW);
+  delay(1000); // Delay
 
-  delay(10000); // Delay everything for 10 seconds
+  digitalWrite(SOLENOID_VALVE_OUTPUT_PIN_2, LOW);
+  delay(1000); // Delay
+
+  digitalWrite(SOLENOID_VALVE_OUTPUT_PIN_3, LOW);
+  delay(1000); // Delay
+
+  digitalWrite(SOLENOID_VALVE_OUTPUT_PIN_4, LOW);
+  delay(1000); // Delay
+
+  digitalWrite(SOLENOID_VALVE_OUTPUT_PIN_5, LOW);
+  delay(1000); // Delay
+
+  // Turn on one set of solenoid valves
+  digitalWrite(SOLENOID_VALVE_OUTPUT_PIN_1, HIGH);
+  delay(1000); // Delay
+  digitalWrite(SOLENOID_VALVE_OUTPUT_PIN_2, HIGH);
+
+  delay(10000); // Keep on for 10 seconds
+
+  // Turn on different set of solenoid valves
+  digitalWrite(SOLENOID_VALVE_OUTPUT_PIN_2, LOW);
+  delay(1000); // Delay
+  digitalWrite(SOLENOID_VALVE_OUTPUT_PIN_3, HIGH);
+  delay(1000); // Delay
+
+  delay(10000); // Keep on for 10 seconds
+
+  // Turn on different set of solenoid valves
+  digitalWrite(SOLENOID_VALVE_OUTPUT_PIN_3, LOW);
+  delay(1000); // Delay
+  digitalWrite(SOLENOID_VALVE_OUTPUT_PIN_4, HIGH);
+  delay(1000); // Delay
+
+  delay(10000); // Keep on for 10 seconds
+
+  // Turn on different set of solenoid valves
+  digitalWrite(SOLENOID_VALVE_OUTPUT_PIN_4, LOW);
+  delay(1000); // Delay
+  digitalWrite(SOLENOID_VALVE_OUTPUT_PIN_5, HIGH);
+  delay(1000); // Delay
+
+  delay(10000); // Keep on for 10 seconds
 }
 
 void loop()
 {
-
+  delay(1000); // Delay
   controlSolenoidValve();
-
+  delay(1000); // Delay
   // PIR CODE BELOW
 
   // int sensor_output;
