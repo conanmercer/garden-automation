@@ -14,6 +14,10 @@ void setup()
 {
   // Solenoid Pins
   pinMode(SOLENOID_VALVE_OUTPUT_PIN_1, OUTPUT);
+  pinMode(SOLENOID_VALVE_OUTPUT_PIN_2, OUTPUT);
+  pinMode(SOLENOID_VALVE_OUTPUT_PIN_3, OUTPUT);
+  pinMode(SOLENOID_VALVE_OUTPUT_PIN_4, OUTPUT);
+  pinMode(SOLENOID_VALVE_OUTPUT_PIN_5, OUTPUT);
 
   // PIR PINS
   pinMode(PIR_SENSOR_OUTPUT_PIN, INPUT);
@@ -26,21 +30,37 @@ void setup()
 
 void controlSolenoidValve()
 {
-  // Turn on solenoid valve on pin 1
+  // Turn on each solenoid valve with 3 second delays between each actuation
   digitalWrite(SOLENOID_VALVE_OUTPUT_PIN_1, HIGH);
+  delay(3000); // Delay
+  digitalWrite(SOLENOID_VALVE_OUTPUT_PIN_2, HIGH);
+  delay(3000); // Delay
+  digitalWrite(SOLENOID_VALVE_OUTPUT_PIN_3, HIGH);
+  delay(3000); // Delay
+  digitalWrite(SOLENOID_VALVE_OUTPUT_PIN_4, HIGH);
+  delay(3000); // Delay
+  digitalWrite(SOLENOID_VALVE_OUTPUT_PIN_5, HIGH);
 
-  delay(5000); // Optional delay for stability
+  delay(10000); // Delay everything for 10 seconds
 
-  // Turn off solenoid valve on pin 1
+  // Turn off each solenoid valve with 3 second delays between each actuation
   digitalWrite(SOLENOID_VALVE_OUTPUT_PIN_1, LOW);
+  delay(3000); // Delay
+  digitalWrite(SOLENOID_VALVE_OUTPUT_PIN_2, LOW);
+  delay(3000); // Delay
+  digitalWrite(SOLENOID_VALVE_OUTPUT_PIN_3, LOW);
+  delay(3000); // Delay
+  digitalWrite(SOLENOID_VALVE_OUTPUT_PIN_4, LOW);
+  delay(3000); // Delay
+  digitalWrite(SOLENOID_VALVE_OUTPUT_PIN_5, LOW);
+
+  delay(10000); // Delay everything for 10 seconds
 }
 
 void loop()
 {
 
   controlSolenoidValve();
-  Serial.print("Code Activated");
-  delay(5000); // Wait for 5 seconds
 
   // PIR CODE BELOW
 
