@@ -1,6 +1,7 @@
 #include <Arduino.h>
 
-const int PIR_SENSOR_OUTPUT_PIN = 26; /* PIR sensor O/P pin */
+const int PIR_SENSOR_OUTPUT_PIN_1 = 26; /* PIR sensor O/P pin */
+const int PIR_SENSOR_OUTPUT_PIN_2 = 27; /* PIR sensor O/P pin */
 
 const int SOLENOID_VALVE_OUTPUT_PIN_1 = 4;  /* Solenoid valve connected to GPIO pin 4 connected to Relay pin IN_1 */
 const int SOLENOID_VALVE_OUTPUT_PIN_2 = 5;  /* Solenoid valve connected to GPIO pin 5 connected to Relay pin IN_2 */
@@ -12,6 +13,8 @@ int warm_up;
 
 void setup()
 {
+  Serial.begin(115200); // initialize serial
+  
   // Solenoid Pins
   pinMode(SOLENOID_VALVE_OUTPUT_PIN_1, OUTPUT);
   pinMode(SOLENOID_VALVE_OUTPUT_PIN_2, OUTPUT);
@@ -20,7 +23,9 @@ void setup()
   pinMode(SOLENOID_VALVE_OUTPUT_PIN_5, OUTPUT);
 
   // PIR PINS
-  pinMode(PIR_SENSOR_OUTPUT_PIN, INPUT);
+  pinMode(PIR_SENSOR_OUTPUT_PIN_1, INPUT_PULLUP);
+  pinMode(PIR_SENSOR_OUTPUT_PIN_2, INPUT_PULLUP);
+  delay(20000); /* Power On Warm Up Delay */
 }
 
 void turnOffAllSolenoidValves()
@@ -124,22 +129,9 @@ void testPIRSolenoidValve()
   turnOnMainsSolenoidValve();
   delay(100); // Delay
 
-  turnOnSolenoidValve3();
+  turnOnSolenoidValve4();
   delay(10000);
-  turnOffSolenoidValve3();
-}
-
-void testPIR()
-{
-  int sensor_output;
-  sensor_output = digitalRead(PIR_SENSOR_OUTPUT_PIN);
-  if (sensor_output == LOW)
-  {
-  }
-  else
-  {
-    testPIRSolenoidValve();
-  }
+  turnOffSolenoidValve4();
 }
 
 void loop()
@@ -152,5 +144,23 @@ void loop()
 
   // PIR CODE BELOW
 
-  testPIR();
+  int sensor_output_1;
+  int sensor_output_2;
+  sensor_output_1 = digitalRead(PIR_SENSOR_OUTPUT_PIN_1);
+  sensor_output_2 = digitalRead(PIR_SENSOR_OUTPUT_PIN_2);
+  if (sensor_output_1 || sensor_output_2 == LOW)
+  {
+    if (warm_up == 1)
+    {
+      warm_up = 0;
+      delay(2000);
+    }
+    delay(1000);
+  }
+  else
+  {
+    testPIRSolenoidValve();
+    warm_up = 1;
+    delay(1000);
+  }
 }
