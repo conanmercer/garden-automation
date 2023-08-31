@@ -1,154 +1,96 @@
 #include <Arduino.h>
 
-const int PIR_SENSOR_OUTPUT_PIN_1 = 26; /* PIR sensor O/P pin */
-const int PIR_SENSOR_OUTPUT_PIN_2 = 27; /* PIR sensor O/P pin */
+/* PIR sensor connected to GPIO pin 26 */
+/* PIR sensor connected to GPIO pin 27 */
+const int PIR_SENSOR_OUTPUT_PIN_1 = 26;
+const int PIR_SENSOR_OUTPUT_PIN_2 = 27;
 
-const int SOLENOID_VALVE_OUTPUT_PIN_1 = 4;  /* Solenoid valve connected to GPIO pin 4 connected to Relay pin IN_1 */
-const int SOLENOID_VALVE_OUTPUT_PIN_2 = 5;  /* Solenoid valve connected to GPIO pin 5 connected to Relay pin IN_2 */
-const int SOLENOID_VALVE_OUTPUT_PIN_3 = 13; /* Solenoid valve connected to GPIO pin 13 connected to Relay pin IN_3 */
-const int SOLENOID_VALVE_OUTPUT_PIN_4 = 14; /* Solenoid valve connected to GPIO pin 14 connected to Relay pin IN_4 */
-const int SOLENOID_VALVE_OUTPUT_PIN_5 = 16; /* Solenoid valve connected to GPIO pin 16 connected to Relay pin IN_5 */
+/* Solenoid valve connected to GPIO pin 4 connected to Relay pin IN_1 */
+/* Solenoid valve connected to GPIO pin 5 connected to Relay pin IN_2 */
+/* Solenoid valve connected to GPIO pin 13 connected to Relay pin IN_3 */
+/* Solenoid valve connected to GPIO pin 14 connected to Relay pin IN_4 */
+/* Solenoid valve connected to GPIO pin 16 connected to Relay pin IN_5 */
+
+const int SOLENOID_VALVE_OUTPUT_PINS[] = {4, 5, 13, 14, 16};
+const int NUM_SOLENOID_VALVES = sizeof(SOLENOID_VALVE_OUTPUT_PINS) / sizeof(SOLENOID_VALVE_OUTPUT_PINS[0]);
 
 int warm_up;
 
 void setup()
 {
-  Serial.begin(115200); // initialize serial
-  
-  // Solenoid Pins
-  pinMode(SOLENOID_VALVE_OUTPUT_PIN_1, OUTPUT);
-  pinMode(SOLENOID_VALVE_OUTPUT_PIN_2, OUTPUT);
-  pinMode(SOLENOID_VALVE_OUTPUT_PIN_3, OUTPUT);
-  pinMode(SOLENOID_VALVE_OUTPUT_PIN_4, OUTPUT);
-  pinMode(SOLENOID_VALVE_OUTPUT_PIN_5, OUTPUT);
+  Serial.begin(115200);
 
-  // PIR PINS
+  // Loop through the SOLENOID_VALVE_OUTPUT_PINS array and set each pin as an output
+  for (int i = 0; i < NUM_SOLENOID_VALVES; i++)
+  {
+    pinMode(SOLENOID_VALVE_OUTPUT_PINS[i], OUTPUT);
+  }
+
+  // Set the PIR sensor pins as inputs with pull-up resistors
+  // When the PIR senses activity in it's viewing area
+  // it pulls the alarm pin low. But when the sensor is inactive, the pin is basically floating.
+  // To avoid any false-positives, the alarm output should be pulled high to 5V
   pinMode(PIR_SENSOR_OUTPUT_PIN_1, INPUT_PULLUP);
   pinMode(PIR_SENSOR_OUTPUT_PIN_2, INPUT_PULLUP);
-  delay(20000); /* Power On Warm Up Delay */
+
+  delay(20000);
 }
 
 void turnOffAllSolenoidValves()
 {
-  // Turn off each solenoid valve with 100ms second delays between each actuation
-  digitalWrite(SOLENOID_VALVE_OUTPUT_PIN_1, LOW);
-  delay(100); // Delay
-  digitalWrite(SOLENOID_VALVE_OUTPUT_PIN_2, LOW);
-  delay(100); // Delay
-  digitalWrite(SOLENOID_VALVE_OUTPUT_PIN_3, LOW);
-  delay(100); // Delay
-  digitalWrite(SOLENOID_VALVE_OUTPUT_PIN_4, LOW);
-  delay(100); // Delay
-  digitalWrite(SOLENOID_VALVE_OUTPUT_PIN_5, LOW);
-  delay(100); // Delay
+  for (int i = 0; i < NUM_SOLENOID_VALVES; i++)
+  {
+    digitalWrite(SOLENOID_VALVE_OUTPUT_PINS[i], LOW);
+    delay(100);
+  }
 }
 
-void turnOnMainsSolenoidValve()
+void turnOnSolenoidValve(int valveIndex)
 {
-  digitalWrite(SOLENOID_VALVE_OUTPUT_PIN_1, HIGH);
+  digitalWrite(SOLENOID_VALVE_OUTPUT_PINS[valveIndex], HIGH);
 }
 
-void turnOffMainsSolenoidValve()
+void turnOffSolenoidValve(int valveIndex)
 {
-  digitalWrite(SOLENOID_VALVE_OUTPUT_PIN_1, LOW);
+  digitalWrite(SOLENOID_VALVE_OUTPUT_PINS[valveIndex], LOW);
 }
 
-void turnOnSolenoidValve2()
+void cycleThroughAllValves()
 {
-  digitalWrite(SOLENOID_VALVE_OUTPUT_PIN_2, HIGH);
-}
-
-void turnOnSolenoidValve3()
-{
-  digitalWrite(SOLENOID_VALVE_OUTPUT_PIN_3, HIGH);
-}
-
-void turnOnSolenoidValve4()
-{
-  digitalWrite(SOLENOID_VALVE_OUTPUT_PIN_4, HIGH);
-}
-
-void turnOnSolenoidValve5()
-{
-  digitalWrite(SOLENOID_VALVE_OUTPUT_PIN_5, HIGH);
-}
-
-void turnOffSolenoidValve2()
-{
-  digitalWrite(SOLENOID_VALVE_OUTPUT_PIN_2, LOW);
-}
-
-void turnOffSolenoidValve3()
-{
-  digitalWrite(SOLENOID_VALVE_OUTPUT_PIN_3, LOW);
-}
-
-void turnOffSolenoidValve4()
-{
-  digitalWrite(SOLENOID_VALVE_OUTPUT_PIN_4, LOW);
-}
-
-void turnOffSolenoidValve5()
-{
-  digitalWrite(SOLENOID_VALVE_OUTPUT_PIN_5, LOW);
-}
-
-void controlSolenoidValve()
-{
-
-  turnOffAllSolenoidValves();
-
-  delay(1000);
-
-  turnOnMainsSolenoidValve();
-  delay(100); // Delay
-  turnOnSolenoidValve2();
-
-  delay(10000);
-  turnOffSolenoidValve2();
-  turnOnSolenoidValve3();
-
-  delay(10000);
-  turnOffSolenoidValve3();
-  turnOnSolenoidValve4();
-
-  delay(10000);
-  turnOffSolenoidValve4();
-  turnOnSolenoidValve5();
-
-  delay(10000);
-}
-
-void testPIRSolenoidValve()
-{
-
   turnOffAllSolenoidValves();
 
   delay(100);
 
-  turnOnMainsSolenoidValve();
-  delay(100); // Delay
+  turnOnSolenoidValve(0); // Mains water supply
+  delay(100);
 
-  turnOnSolenoidValve4();
+  for (int i = 1; i < NUM_SOLENOID_VALVES; i++)
+  {
+    turnOnSolenoidValve(i);
+    delay(10000);
+    turnOffSolenoidValve(i);
+  }
+
+  delay(100);
+}
+
+void turnOnRightSprinkler()
+{
+  turnOffAllSolenoidValves();
+
+  delay(100);
+
+  turnOnSolenoidValve(3);
   delay(10000);
-  turnOffSolenoidValve4();
+  turnOffSolenoidValve(3);
 }
 
 void loop()
 {
-  // Solenoid CODE BELOW
+  int sensor_output_1 = digitalRead(PIR_SENSOR_OUTPUT_PIN_1);
+  int sensor_output_2 = digitalRead(PIR_SENSOR_OUTPUT_PIN_2);
 
-  // delay(1000); // Delay
-  // controlSolenoidValve();
-  // delay(1000); // Delay
-
-  // PIR CODE BELOW
-
-  int sensor_output_1;
-  int sensor_output_2;
-  sensor_output_1 = digitalRead(PIR_SENSOR_OUTPUT_PIN_1);
-  sensor_output_2 = digitalRead(PIR_SENSOR_OUTPUT_PIN_2);
-  if (sensor_output_1 || sensor_output_2 == LOW)
+  if (sensor_output_1 == LOW || sensor_output_2 == LOW)
   {
     if (warm_up == 1)
     {
@@ -159,7 +101,7 @@ void loop()
   }
   else
   {
-    testPIRSolenoidValve();
+    turnOnRightSprinkler();
     warm_up = 1;
     delay(1000);
   }
