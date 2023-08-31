@@ -1,9 +1,8 @@
 #include <Arduino.h>
 
-/* PIR sensor connected to GPIO pin 26 */
-/* PIR sensor connected to GPIO pin 27 */
 const int PIR_SENSOR_OUTPUT_PIN_1 = 26;
 const int PIR_SENSOR_OUTPUT_PIN_2 = 27;
+const int PIR_SENSOR_OUTPUT_PIN_3 = 25;
 
 /* Solenoid valve connected to GPIO pin 4 connected to Relay pin IN_1 */
 /* Solenoid valve connected to GPIO pin 5 connected to Relay pin IN_2 */
@@ -32,6 +31,7 @@ void setup()
   // To avoid any false-positives, the alarm output should be pulled high to 5V
   pinMode(PIR_SENSOR_OUTPUT_PIN_1, INPUT_PULLUP);
   pinMode(PIR_SENSOR_OUTPUT_PIN_2, INPUT_PULLUP);
+  pinMode(PIR_SENSOR_OUTPUT_PIN_3, INPUT_PULLUP);
 
   delay(20000);
 }
@@ -85,10 +85,23 @@ void turnOnRightSprinkler()
   turnOffSolenoidValve(3);
 }
 
+void turnOnMiddleSprinkler()
+{
+  turnOffAllSolenoidValves();
+
+  delay(100);
+
+  turnOnSolenoidValve(4);
+  delay(10000);
+  turnOffSolenoidValve(4);
+}
+
 void loop()
 {
   int sensor_output_1 = digitalRead(PIR_SENSOR_OUTPUT_PIN_1);
   int sensor_output_2 = digitalRead(PIR_SENSOR_OUTPUT_PIN_2);
+
+  int sensor_output_3 = digitalRead(PIR_SENSOR_OUTPUT_PIN_3);
 
   if (sensor_output_1 == LOW || sensor_output_2 == LOW)
   {
@@ -102,6 +115,22 @@ void loop()
   else
   {
     turnOnRightSprinkler();
+    warm_up = 1;
+    delay(1000);
+  }
+
+  if (sensor_output_3 == LOW)
+  {
+    if (warm_up == 1)
+    {
+      warm_up = 0;
+      delay(2000);
+    }
+    delay(1000);
+  }
+  else
+  {
+    turnOnMiddleSprinkler();
     warm_up = 1;
     delay(1000);
   }
