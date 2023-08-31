@@ -80,9 +80,9 @@ void turnOnRightSprinkler()
 
   delay(100);
 
-  turnOnSolenoidValve(3);
+  turnOnSolenoidValve(2);
   delay(10000);
-  turnOffSolenoidValve(3);
+  turnOffSolenoidValve(2);
 }
 
 void turnOnMiddleSprinkler()
@@ -91,9 +91,9 @@ void turnOnMiddleSprinkler()
 
   delay(100);
 
-  turnOnSolenoidValve(4);
+  turnOnSolenoidValve(3);
   delay(10000);
-  turnOffSolenoidValve(4);
+  turnOffSolenoidValve(3);
 }
 
 void loop()
