@@ -81,9 +81,9 @@ void turnOnRightSprinkler()
   delay(100);
 
   turnOnSolenoidValve(0);
-  turnOnSolenoidValve(2);
+  turnOnSolenoidValve(3);
   delay(10000);
-  turnOffSolenoidValve(2);
+  turnOffSolenoidValve(3);
 }
 
 void turnOnMiddleSprinkler()
@@ -93,9 +93,9 @@ void turnOnMiddleSprinkler()
   delay(100);
 
   turnOnSolenoidValve(0);
-  turnOnSolenoidValve(1);
+  turnOnSolenoidValve(4);
   delay(10000);
-  turnOffSolenoidValve(1);
+  turnOffSolenoidValve(4);
 }
 
 void loop()
@@ -121,19 +121,19 @@ void loop()
     delay(1000);
   }
 
-  if (sensor_output_3 == LOW)
-  {
-    if (warm_up == 1)
-    {
-      warm_up = 0;
-      delay(2000);
-    }
-    delay(1000);
-  }
-  else
-  {
-    turnOnMiddleSprinkler();
-    warm_up = 1;
-    delay(1000);
-  }
+  // if (sensor_output_3 == LOW)
+  // {
+  //   if (warm_up == 1)
+  //   {
+  //     warm_up = 0;
+  //     delay(2000);
+  //   }
+  //   delay(1000);
+  // }
+  // else
+  // {
+  //   turnOnMiddleSprinkler();
+  //   warm_up = 1;
+  //   delay(1000);
+  // }
 }
