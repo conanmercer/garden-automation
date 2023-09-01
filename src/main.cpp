@@ -29,9 +29,9 @@ void setup()
   // When the PIR senses activity in it's viewing area
   // it pulls the alarm pin low. But when the sensor is inactive, the pin is basically floating.
   // To avoid any false-positives, the alarm output should be pulled high to 5V
-  pinMode(PIR_SENSOR_OUTPUT_PIN_1, INPUT_PULLUP);
-  pinMode(PIR_SENSOR_OUTPUT_PIN_2, INPUT_PULLUP);
-  pinMode(PIR_SENSOR_OUTPUT_PIN_3, INPUT_PULLUP);
+  pinMode(PIR_SENSOR_OUTPUT_PIN_1, INPUT);
+  pinMode(PIR_SENSOR_OUTPUT_PIN_2, INPUT);
+  pinMode(PIR_SENSOR_OUTPUT_PIN_3, INPUT);
 
   delay(20000);
 }
@@ -93,9 +93,9 @@ void turnOnMiddleSprinkler()
   delay(100);
 
   turnOnSolenoidValve(0);
-  turnOnSolenoidValve(3);
+  turnOnSolenoidValve(1);
   delay(10000);
-  turnOffSolenoidValve(3);
+  turnOffSolenoidValve(1);
 }
 
 void loop()
