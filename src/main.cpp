@@ -120,6 +120,8 @@ void loop()
   if (left_sensor_output == HIGH)
     turnOnMiddleSprinkler();
 
+  delay(2000);
+
   // if (right_sensor_output == LOW)
   // {
   //   if (warm_up == 1)
