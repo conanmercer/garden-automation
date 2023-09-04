@@ -35,9 +35,10 @@ void setup()
 
   // When the PIR senses activity in it's viewing area
   // it pulls the alarm pin HIGH. But when the sensor is inactive, the pin is basically floating.
-  pinMode(PIR_SENSOR_OUTPUT_PIN_1, INPUT);
-  pinMode(PIR_SENSOR_OUTPUT_PIN_2, INPUT);
-  pinMode(PIR_SENSOR_OUTPUT_PIN_3, INPUT);
+  // INPUT_PULLDOWN makes sure no false positives
+  pinMode(PIR_SENSOR_OUTPUT_PIN_1, INPUT_PULLDOWN);
+  pinMode(PIR_SENSOR_OUTPUT_PIN_2, INPUT_PULLDOWN);
+  pinMode(PIR_SENSOR_OUTPUT_PIN_3, INPUT_PULLDOWN);
 
   delay(20000);
 }
@@ -91,6 +92,8 @@ void turnOnRightSprinkler()
   turnOnSolenoidValve(0);
   delay(10000);
   turnOffSolenoidValve(3);
+  // Allow 5 seconds for sprinkler to go back into ground otherwise motion detected
+  delay(5000);
 }
 
 void turnOnMiddleSprinkler()
@@ -102,55 +105,26 @@ void turnOnMiddleSprinkler()
   turnOnSolenoidValve(0);
   delay(10000);
   turnOffSolenoidValve(4);
+  // Allow 5 seconds for sprinkler to go back into ground otherwise motion detected
+  delay(5000);
 }
 
 void loop()
 {
-
   int left_sensor_output = digitalRead(PIR_SENSOR_OUTPUT_PIN_3);
   int middle_sensor_output = digitalRead(PIR_SENSOR_OUTPUT_PIN_2);
   int right_sensor_output = digitalRead(PIR_SENSOR_OUTPUT_PIN_1);
 
-  if (right_sensor_output == HIGH)
-    turnOnRightSprinkler();
-
-  if (middle_sensor_output == HIGH)
-    turnOnRightSprinkler();
-
   if (left_sensor_output == HIGH)
+  {
     turnOnMiddleSprinkler();
-
-  delay(2000);
-
-  // if (right_sensor_output == LOW)
-  // {
-  //   if (warm_up == 1)
-  //   {
-  //     warm_up = 0;
-  //     delay(2000);
-  //   }
-  //   delay(100);
-  // }
-  // else
-  // {
-  //   turnOnRightSprinkler();
-  //   warm_up = 1;
-  //   delay(100);
-  // }
-
-  // if (middle_sensor_output == LOW)
-  // {
-  //   if (warm_up == 1)
-  //   {
-  //     warm_up = 0;
-  //     delay(2000);
-  //   }
-  //   delay(100);
-  // }
-  // else
-  // {
-  //   turnOnRightSprinkler();
-  //   warm_up = 1;
-  //   delay(100);
-  // }
+  }
+  else if (middle_sensor_output == HIGH || right_sensor_output == HIGH)
+  {
+    turnOnRightSprinkler();
+  }
+  else
+  {
+    turnOffAllSolenoidValves();
+  }
 }
