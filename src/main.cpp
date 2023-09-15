@@ -1,130 +1,101 @@
 #include <Arduino.h>
+#include "solenoids.h"
+#include "irrigation.h"
 
-// Right PIR Sensor
-const int PIR_SENSOR_OUTPUT_PIN_1 = 25;
-// Middle PIR Sensor
-const int PIR_SENSOR_OUTPUT_PIN_2 = 26;
-// Left PIR Sensor
-const int PIR_SENSOR_OUTPUT_PIN_3 = 27;
+// PIR Sensor Pins
+const int PIR_SENSOR_PINS[] = {27, 26, 25}; // Left, Middle, Right
+const int NUM_PIR_SENSORS = sizeof(PIR_SENSOR_PINS) / sizeof(PIR_SENSOR_PINS[0]);
 
-/* Solenoid valve connected to GPIO pin 4 connected to Relay pin IN_1 */
-/* Solenoid valve connected to GPIO pin 5 connected to Relay pin IN_2 */
-/* Solenoid valve connected to GPIO pin 13 connected to Relay pin IN_3 */
-/* Solenoid valve connected to GPIO pin 14 connected to Relay pin IN_4 */
-/* Solenoid valve connected to GPIO pin 16 connected to Relay pin IN_5 */
+unsigned long lastMotionTime = 0; // Timestamp of the last motion detected
+int motionCount = 0;              // Counter for motion detections
+bool motionCountExceeded = false; // Flag to track if motion count exceeded
 
-// Side Garden Water = pin 1
-// Terrace Water = pin 2
-// Right Sprinkler Water = pin 3
-// Middle Sprinkler = pin 4
-
-const int SOLENOID_VALVE_OUTPUT_PINS[] = {4, 5, 13, 14, 16};
-const int NUM_SOLENOID_VALVES = sizeof(SOLENOID_VALVE_OUTPUT_PINS) / sizeof(SOLENOID_VALVE_OUTPUT_PINS[0]);
-
-int warm_up;
+static unsigned long lastIrrigationRun = 0;
+static unsigned long lastSprinklersRun = 0;
+const unsigned long IRRIGATION_INTERVAL = 2UL * 24 * 60 * 60 * 1000; // 2 days in milliseconds
+const unsigned long SPRINKLERS_INTERVAL = 24 * 60 * 60 * 1000;       // 1 day in milliseconds
 
 void setup()
 {
   Serial.begin(115200);
 
-  // Loop through the SOLENOID_VALVE_OUTPUT_PINS array and set each pin as an output
+  // Initialize Solenoid Valve Pins as OUTPUT
   for (int i = 0; i < NUM_SOLENOID_VALVES; i++)
   {
-    pinMode(SOLENOID_VALVE_OUTPUT_PINS[i], OUTPUT);
+    pinMode(SOLENOID_VALVE_PINS[i], OUTPUT);
   }
 
-  // When the PIR senses activity in it's viewing area
-  // it pulls the alarm pin HIGH. But when the sensor is inactive, the pin is basically floating.
-  // INPUT_PULLDOWN makes sure no false positives
-  pinMode(PIR_SENSOR_OUTPUT_PIN_1, INPUT_PULLDOWN);
-  pinMode(PIR_SENSOR_OUTPUT_PIN_2, INPUT_PULLDOWN);
-  pinMode(PIR_SENSOR_OUTPUT_PIN_3, INPUT_PULLDOWN);
-
-  delay(20000);
-}
-
-void turnOffAllSolenoidValves()
-{
-  for (int i = 0; i < NUM_SOLENOID_VALVES; i++)
+  // Initialize PIR Sensor Pins with INPUT_PULLDOWN
+  for (int i = 0; i < NUM_PIR_SENSORS; i++)
   {
-    digitalWrite(SOLENOID_VALVE_OUTPUT_PINS[i], LOW);
-    delay(100);
+    pinMode(PIR_SENSOR_PINS[i], INPUT_PULLDOWN);
   }
-}
-
-void turnOnSolenoidValve(int valveIndex)
-{
-  digitalWrite(SOLENOID_VALVE_OUTPUT_PINS[valveIndex], HIGH);
-}
-
-void turnOffSolenoidValve(int valveIndex)
-{
-  digitalWrite(SOLENOID_VALVE_OUTPUT_PINS[valveIndex], LOW);
-}
-
-void cycleThroughAllValves()
-{
-  turnOffAllSolenoidValves();
-
-  delay(100);
-
-  turnOnSolenoidValve(0); // Mains water supply
-  delay(100);
-
-  for (int i = 1; i < NUM_SOLENOID_VALVES; i++)
-  {
-    turnOnSolenoidValve(i);
-    delay(10000);
-    turnOffSolenoidValve(i);
-  }
-
-  delay(100);
-}
-
-void turnOnRightSprinkler()
-{
-  turnOffAllSolenoidValves();
-
-  delay(100);
-
-  turnOnSolenoidValve(3);
-  delay(500);
-  turnOnSolenoidValve(0);
-  delay(10000);
-  turnOffSolenoidValve(3);
-  // Allow 5 seconds for sprinkler to go back into ground otherwise motion detected
-  delay(5000);
-}
-
-void turnOnMiddleSprinkler()
-{
-  turnOffAllSolenoidValves();
-
-  turnOnSolenoidValve(4);
-  delay(500);
-  turnOnSolenoidValve(0);
-  delay(10000);
-  turnOffSolenoidValve(4);
-  // Allow 5 seconds for sprinkler to go back into ground otherwise motion detected
-  delay(5000);
 }
 
 void loop()
 {
-  int left_sensor_output = digitalRead(PIR_SENSOR_OUTPUT_PIN_3);
-  int middle_sensor_output = digitalRead(PIR_SENSOR_OUTPUT_PIN_2);
-  int right_sensor_output = digitalRead(PIR_SENSOR_OUTPUT_PIN_1);
+  unsigned long currentTime = millis();
+  bool motionDetected = false;
 
-  if (left_sensor_output == HIGH)
+  // Check if it's time to run runIrrigation() every 2 days
+  if (currentTime - lastIrrigationRun >= IRRIGATION_INTERVAL)
   {
-    turnOnMiddleSprinkler();
+    runIrrigation();
+    lastIrrigationRun = currentTime;
   }
-  else if (middle_sensor_output == HIGH || right_sensor_output == HIGH)
+
+  // Check if it's time to run runSprinklers() every day
+  if (currentTime - lastSprinklersRun >= SPRINKLERS_INTERVAL)
   {
-    turnOnRightSprinkler();
+    runSprinklers();
+    lastSprinklersRun = currentTime;
   }
-  else
+
+  // Check PIR sensor pins for motion
+  // Check if motionCountExceeded is false before running the loop
+  if (!motionCountExceeded)
   {
-    turnOffAllSolenoidValves();
+    // Check PIR sensor pins for motion
+    for (int i = 0; i < 3; i++)
+    {
+      if (digitalRead(PIR_SENSOR_PINS[i]) == HIGH)
+      {
+        motionDetected = true;
+        motionCount++;
+
+        if (!motionCountExceeded && motionCount > 5)
+        {
+          motionCountExceeded = true;
+          lastMotionTime = currentTime;
+        }
+      }
+    }
+  }
+
+  // Process motion detection
+  if (motionDetected)
+  {
+    if (!motionCountExceeded)
+    {
+      // Within the allowed limit
+      if (digitalRead(PIR_SENSOR_PINS[0]) == HIGH)
+      {
+        motionControlledSprinkler(4); // Middle Sprinkler
+      }
+      else
+      {
+        motionControlledSprinkler(3); // Right Sprinkler
+      }
+    }
+    else
+    {
+    }
+  }
+
+  // Check if 1 hour have passed since motion count exceeded 5
+  if (motionCountExceeded && currentTime - lastMotionTime >= 3600000)
+  {
+    motionCount = 0;
+    motionCountExceeded = false;
   }
 }
