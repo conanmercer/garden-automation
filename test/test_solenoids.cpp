@@ -39,12 +39,29 @@ void test_turnOffAllSolenoidValves(void)
     }
 }
 
+void test_turnOnSolenoidValve(void)
+{
+    // Arrange: Turn off all solenoid valves
+    for (int i = 0; i < NUM_SOLENOID_VALVES; i++)
+    {
+        digitalWrite(SOLENOID_VALVE_PINS[i], LOW);
+        delay(100);
+    }
+
+    // Act: Call the function to turn on solenoid valve
+    turnOnSolenoidValve(2);
+
+    // Assert: Verify if solenoid valve is turned on
+    TEST_ASSERT_EQUAL_INT(HIGH, digitalRead(SOLENOID_VALVE_PINS[2]));
+}
+
 void setup()
 {
     delay(2000);   // service delay
     UNITY_BEGIN(); // start unit testing
 
     RUN_TEST(test_turnOffAllSolenoidValves);
+    RUN_TEST(test_turnOnSolenoidValve);
 
     UNITY_END(); // stop unit testing
 }
