@@ -12,8 +12,8 @@ bool motionCountExceeded = false; // Flag to track if motion count exceeded
 
 static unsigned long lastIrrigationRun = 0;
 static unsigned long lastSprinklersRun = 0;
-const unsigned long SUMMER_IRRIGATION_INTERVAL = 2UL * 24 * 60 * 60 * 1000; // 2 days in milliseconds
-const unsigned long SUMMER_SPRINKLERS_INTERVAL = 24 * 60 * 60 * 1000;       // 1 day in milliseconds
+const unsigned long IRRIGATION_INTERVAL = 2UL * 24 * 60 * 60 * 1000; // 2 days in milliseconds
+const unsigned long SPRINKLERS_INTERVAL = 24 * 60 * 60 * 1000;       // 1 day in milliseconds
 
 void setup()
 {
@@ -38,14 +38,14 @@ void loop()
   bool motionDetected = false;
 
   // Check if it's time to run runIrrigation() every 2 days
-  if (currentTime - lastIrrigationRun >= SUMMER_IRRIGATION_INTERVAL)
+  if (currentTime - lastIrrigationRun >= IRRIGATION_INTERVAL)
   {
     runIrrigation();
     lastIrrigationRun = currentTime;
   }
 
   // Check if it's time to run runSprinklers() every day
-  if (currentTime - lastSprinklersRun >= SUMMER_SPRINKLERS_INTERVAL)
+  if (currentTime - lastSprinklersRun >= SPRINKLERS_INTERVAL)
   {
     runSprinklers();
     lastSprinklersRun = currentTime;
