@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <unity.h>
+#include <random>
 #include "solenoids.h"
 
 void setupSolenoidValvePins()
@@ -49,10 +50,11 @@ void test_turnOnSolenoidValve(void)
     }
 
     // Act: Call the function to turn on solenoid valve
-    turnOnSolenoidValve(2);
+    int randomNumber = std::rand() % 4 + 0;
+    turnOnSolenoidValve(randomNumber);
 
     // Assert: Verify if solenoid valve is turned on
-    TEST_ASSERT_EQUAL_INT(HIGH, digitalRead(SOLENOID_VALVE_PINS[2]));
+    TEST_ASSERT_EQUAL_INT(HIGH, digitalRead(SOLENOID_VALVE_PINS[randomNumber]));
 }
 
 void test_turnOffSolenoidValve(void)
@@ -65,10 +67,11 @@ void test_turnOffSolenoidValve(void)
     }
 
     // Act: Call the function to turn off solenoid valve
-    turnOffSolenoidValve(2);
+    int randomNumber = std::rand() % 4 + 0;
+    turnOffSolenoidValve(randomNumber);
 
     // Assert: Verify if solenoid valve is turned off
-    TEST_ASSERT_EQUAL_INT(LOW, digitalRead(SOLENOID_VALVE_PINS[2]));
+    TEST_ASSERT_EQUAL_INT(LOW, digitalRead(SOLENOID_VALVE_PINS[randomNumber]));
 }
 
 void setup()
