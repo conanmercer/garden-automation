@@ -12,8 +12,10 @@ bool motionCountExceeded = false; // Flag to track if motion count exceeded
 
 static unsigned long lastIrrigationRun = 0;
 static unsigned long lastSprinklersRun = 0;
-const unsigned long IRRIGATION_INTERVAL = 2UL * 24 * 60 * 60 * 1000; // 2 days in milliseconds
-const unsigned long SPRINKLERS_INTERVAL = 24 * 60 * 60 * 1000;       // 1 day in milliseconds
+// const unsigned long IRRIGATION_INTERVAL = 2UL * 24 * 60 * 60 * 1000; // 2 days in milliseconds (summer)
+// const unsigned long SPRINKLERS_INTERVAL = 24 * 60 * 60 * 1000;       // 1 day in milliseconds (summer)
+const unsigned long IRRIGATION_INTERVAL = 7UL * 24 * 60 * 60 * 1000; // 7 days in milliseconds (winter)
+const unsigned long SPRINKLERS_INTERVAL = 8UL * 24 * 60 * 60 * 1000; // 8 days in milliseconds (winter)
 
 void setup()
 {
@@ -51,26 +53,28 @@ void loop()
     lastSprinklersRun = currentTime;
   }
 
+  // the following is turned off for the moment:
+
   // Check PIR sensor pins for motion
   // Check if motionCountExceeded is false before running the loop
-  if (!motionCountExceeded)
-  {
-    // Check PIR sensor pins for motion
-    for (int i = 0; i < 3; i++)
-    {
-      if (digitalRead(PIR_SENSOR_PINS[i]) == HIGH)
-      {
-        motionDetected = true;
-        motionCount++;
+  // if (!motionCountExceeded)
+  // {
+  //   // Check PIR sensor pins for motion
+  //   for (int i = 0; i < 3; i++)
+  //   {
+  //     if (digitalRead(PIR_SENSOR_PINS[i]) == HIGH)
+  //     {
+  //       motionDetected = true;
+  //       motionCount++;
 
-        if (!motionCountExceeded && motionCount > 5)
-        {
-          motionCountExceeded = true;
-          lastMotionTime = currentTime;
-        }
-      }
-    }
-  }
+  //       if (!motionCountExceeded && motionCount > 5)
+  //       {
+  //         motionCountExceeded = true;
+  //         lastMotionTime = currentTime;
+  //       }
+  //     }
+  //   }
+  // }
 
   // Process motion detection
   if (motionDetected)
