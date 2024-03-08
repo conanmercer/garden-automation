@@ -39,18 +39,20 @@ void loop()
   unsigned long currentTime = millis();
   bool motionDetected = false;
 
-  // Check if it's time to run runIrrigation() every 2 days
+  // Check if it's time to run runIrrigation()
   if (currentTime - lastIrrigationRun >= IRRIGATION_INTERVAL)
   {
+    unsigned long randomDelay = random(0, 24) * 60 * 60 * 1000; // Generate a random delay within 24 hours
     runIrrigation();
-    lastIrrigationRun = currentTime;
+    lastIrrigationRun = currentTime + randomDelay;
   }
 
-  // Check if it's time to run runSprinklers() every day
+  // Check if it's time to run runSprinklers()
   if (currentTime - lastSprinklersRun >= SPRINKLERS_INTERVAL)
   {
+    unsigned long randomDelay = random(0, 24) * 60 * 60 * 1000; // Generate a random delay within 24 hours
     runSprinklers();
-    lastSprinklersRun = currentTime;
+    lastSprinklersRun = currentTime + randomDelay;
   }
 
   // the following is turned off for the moment:

@@ -6,11 +6,13 @@ void runIrrigation()
     turnOffAllSolenoidValves();
     turnOnSolenoidValve(0);
     turnOnSolenoidValve(2);
-    delay(90000); // Terrace 1.5 mins
+    unsigned long delayTime = random(60, 121) * 1000; // Generate random delay between 60 and 120 seconds
+    delay(delayTime);                                 // Terrace random delay between 60 and 120 seconds
     turnOffAllSolenoidValves();
     turnOnSolenoidValve(0);
     turnOnSolenoidValve(1);
-    delay(600000); // Side garden 10 mins
+    unsigned long delayTime = random(9, 12) * 60 * 1000; // Generate random delay between 9 and 11 minutes
+    delay(delayTime);                                    // Side garden random between 9 and 11 minutes
     turnOffAllSolenoidValves();
 }
 
@@ -19,10 +21,11 @@ void runSprinklers()
     turnOffAllSolenoidValves();
     turnOnSolenoidValve(0);
     turnOnSolenoidValve(3);
-    delay(600000); // Right Sprinkler 10 mins
+    unsigned long delayTime = random(9, 12) * 60 * 1000; // Generate random delay between 9 and 11 minutes
+    delay(delayTime);                                    // Right Sprinkler random between 9 and 11 minutes
     turnOffAllSolenoidValves();
     turnOnSolenoidValve(0);
     turnOnSolenoidValve(4);
-    delay(600000); // Middle Sprinkler 10 mins
+    delay(delayTime); // Middle Sprinkler random between 9 and 11 minutes
     turnOffAllSolenoidValves();
 }
