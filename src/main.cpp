@@ -2,10 +2,7 @@
 #include "solenoids.h"
 #include "irrigation.h"
 #include "scheduler.h"
-
-// PIR Sensor Pins
-const int PIR_SENSOR_PINS[] = {27, 26, 25}; // Left, Middle, Right
-const int NUM_PIR_SENSORS = sizeof(PIR_SENSOR_PINS) / sizeof(PIR_SENSOR_PINS[0]);
+#include "pin_initializer.h"
 
 unsigned long lastMotionTime = 0; // Timestamp of the last motion detected
 int motionCount = 0;              // Counter for motion detections
@@ -19,24 +16,18 @@ const unsigned long sprinklersInterval = 7UL * 24 * 60 * 60 * 1000; // 7 days in
 // const unsigned long sprinklersInterval = 5UL * 1000; // 5 seconds in milliseconds (for testing)
 
 Scheduler scheduler(irrigationInterval, sprinklersInterval);
+PinInitializer pinInitializer;
 
 void setup()
 {
+  // Set the intervals for the scheduler
   scheduler = Scheduler(irrigationInterval, sprinklersInterval);
   scheduler.setIrrigationInterval(irrigationInterval);
   scheduler.setSprinklersInterval(sprinklersInterval);
 
-  // Initialize Solenoid Valve Pins as OUTPUT
-  for (int i = 0; i < NUM_SOLENOID_VALVES; i++)
-  {
-    pinMode(SOLENOID_VALVE_PINS[i], OUTPUT);
-  }
-
-  // Initialize PIR Sensor Pins with INPUT_PULLDOWN
-  for (int i = 0; i < NUM_PIR_SENSORS; i++)
-  {
-    pinMode(PIR_SENSOR_PINS[i], INPUT_PULLDOWN);
-  }
+  // Initialize pin configuration
+  pinInitializer.setupSolenoidValvePins();
+  pinInitializer.setupPIRSensorPins();
 }
 
 void loop()
