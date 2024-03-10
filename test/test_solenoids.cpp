@@ -1,7 +1,8 @@
+#include "solenoids.h"
+#include "solenoids.cpp"
 #include <Arduino.h>
 #include <unity.h>
 #include <random>
-#include "solenoids.h"
 
 void setupSolenoidValvePins()
 {
