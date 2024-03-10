@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include "solenoids.h"
 #include "irrigation.h"
+#include "scheduler.h"
 
 // PIR Sensor Pins
 const int PIR_SENSOR_PINS[] = {27, 26, 25}; // Left, Middle, Right
@@ -10,16 +11,20 @@ unsigned long lastMotionTime = 0; // Timestamp of the last motion detected
 int motionCount = 0;              // Counter for motion detections
 bool motionCountExceeded = false; // Flag to track if motion count exceeded
 
-static unsigned long lastIrrigationRun = 0;
-static unsigned long lastSprinklersRun = 0;
-// const unsigned long IRRIGATION_INTERVAL = 2UL * 24 * 60 * 60 * 1000; // 2 days in milliseconds (summer)
-// const unsigned long SPRINKLERS_INTERVAL = 24 * 60 * 60 * 1000;       // 1 day in milliseconds (summer)
-const unsigned long IRRIGATION_INTERVAL = 7UL * 24 * 60 * 60 * 1000; // 7 days in milliseconds (winter)
-const unsigned long SPRINKLERS_INTERVAL = 8UL * 24 * 60 * 60 * 1000; // 8 days in milliseconds (winter)
+// const unsigned long irrigationInterval = 2UL * 24 * 60 * 60 * 1000; // 2 days in milliseconds (summer)
+// const unsigned long sprinklersInterval = 24 * 60 * 60 * 1000;       // 1 day in milliseconds (summer)
+const unsigned long irrigationInterval = 6UL * 24 * 60 * 60 * 1000; // 7 days in milliseconds (winter)
+const unsigned long sprinklersInterval = 7UL * 24 * 60 * 60 * 1000; // 8 days in milliseconds (winter)
+// const unsigned long irrigationInterval = 3UL * 1000; // 3 seconds in milliseconds (for testing)
+// const unsigned long sprinklersInterval = 5UL * 1000; // 5 seconds in milliseconds (for testing)
+
+Scheduler scheduler(irrigationInterval, sprinklersInterval);
 
 void setup()
 {
-  Serial.begin(115200);
+  scheduler = Scheduler(irrigationInterval, sprinklersInterval);
+  scheduler.setIrrigationInterval(irrigationInterval);
+  scheduler.setSprinklersInterval(sprinklersInterval);
 
   // Initialize Solenoid Valve Pins as OUTPUT
   for (int i = 0; i < NUM_SOLENOID_VALVES; i++)
@@ -39,21 +44,7 @@ void loop()
   unsigned long currentTime = millis();
   bool motionDetected = false;
 
-  // Check if it's time to run runIrrigation()
-  if (currentTime - lastIrrigationRun >= IRRIGATION_INTERVAL)
-  {
-    unsigned long randomDelay = random(0, 24) * 60 * 60 * 1000; // Generate a random delay within 24 hours
-    runIrrigation();
-    lastIrrigationRun = currentTime + randomDelay;
-  }
-
-  // Check if it's time to run runSprinklers()
-  if (currentTime - lastSprinklersRun >= SPRINKLERS_INTERVAL)
-  {
-    unsigned long randomDelay = random(0, 24) * 60 * 60 * 1000; // Generate a random delay within 24 hours
-    runSprinklers();
-    lastSprinklersRun = currentTime + randomDelay;
-  }
+  scheduler.run();
 
   // the following is turned off for the moment:
 
