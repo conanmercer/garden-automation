@@ -20,20 +20,20 @@ public:
     Scheduler(unsigned long irrigationInterval, unsigned long sprinklersInterval) : irrigationInterval(irrigationInterval),
                                                                                     sprinklersInterval(sprinklersInterval) {}
 
-    void run()
+    void run(unsigned long currentTime)
     {
-        unsigned long currentTime = millis();
-
         if (currentTime - lastIrrigationRun >= irrigationInterval)
         {
             runIrrigation();
-            lastIrrigationRun = currentTime + random(0, 24) * 60 * 60 * 1000;
+            Serial.println("Irrigation completed.");
+            lastIrrigationRun = currentTime;
         }
 
-        if (currentTime - lastSprinklersRun >= sprinklersInterval)
+        else if (currentTime - lastSprinklersRun >= sprinklersInterval)
         {
             runSprinklers();
-            lastSprinklersRun = currentTime + random(0, 24) * 60 * 60 * 1000;
+            Serial.println("Sprinkler completed.");
+            lastSprinklersRun = currentTime;
         }
     }
 
