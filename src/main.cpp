@@ -12,8 +12,8 @@ bool motionCountExceeded = false; // Flag to track if motion count exceeded
 // const unsigned long sprinklersInterval = 24 * 60 * 60 * 1000;       // 1 day in milliseconds (summer)
 const unsigned long irrigationInterval = 6UL * 24 * 60 * 60 * 1000; // 6 days in milliseconds (winter)
 const unsigned long sprinklersInterval = 7UL * 24 * 60 * 60 * 1000; // 7 days in milliseconds (winter)
-// const unsigned long irrigationInterval = 1UL * 60 * 1000; // 1 minutes in milliseconds (for testing)
-// const unsigned long sprinklersInterval = 70UL * 1000;     // 1 minute and 10 seconds in milliseconds (for testing)
+// const unsigned long irrigationInterval = 12UL * 60 * 1000; // 12 minutes in milliseconds (for testing)
+// const unsigned long sprinklersInterval = 14UL * 60 * 1000; // 14 minutes in milliseconds (for testing)
 
 Scheduler scheduler(irrigationInterval, sprinklersInterval);
 PinInitializer pinInitializer;
