@@ -8,7 +8,7 @@ unsigned long lastMotionTime = 0; // Timestamp of the last motion detected
 int motionCount = 0;              // Counter for motion detections
 bool motionCountExceeded = false; // Flag to track if motion count exceeded
 
-const unsigned long irrigationInterval = 2UL * 24 * 60 * 60 * 1000; // 2 days in milliseconds (summer)
+const unsigned long irrigationInterval = 1.5 * 24 * 60 * 60 * 1000; // 1.5 days in milliseconds (summer)
 const unsigned long sprinklersInterval = 24 * 60 * 60 * 1000;       // 1 day in milliseconds (summer)
 // const unsigned long irrigationInterval = 6UL * 24 * 60 * 60 * 1000; // 6 days in milliseconds (winter)
 // const unsigned long sprinklersInterval = 7UL * 24 * 60 * 60 * 1000; // 7 days in milliseconds (winter)

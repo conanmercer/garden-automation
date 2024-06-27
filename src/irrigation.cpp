@@ -21,11 +21,15 @@ void runSprinklers()
     turnOffAllSolenoidValves();
     turnOnSolenoidValve(0);
     turnOnSolenoidValve(3);
-    unsigned long sprinklerDelay = random(5, 10) * 60 * 1000; // Generate random delay between 5 and 10 minutes
+    unsigned long sprinklerDelay = random(8, 10) * 60 * 1000; // Generate random delay between 5 and 10 minutes
     delay(sprinklerDelay);                                    // Right Sprinkler random between 5 and 10 minutes
     turnOffAllSolenoidValves();
     turnOnSolenoidValve(0);
     turnOnSolenoidValve(4);
     delay(sprinklerDelay); // Middle Sprinkler random between 9 and 11 minutes
+    turnOffAllSolenoidValves();
+    turnOnSolenoidValve(0);
+    turnOnSolenoidValve(5);
+    delay(sprinklerDelay); // Left Sprinkler random between 9 and 11 minutes
     turnOffAllSolenoidValves();
 }
