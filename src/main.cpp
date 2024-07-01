@@ -9,7 +9,7 @@ int motionCount = 0;              // Counter for motion detections
 bool motionCountExceeded = false; // Flag to track if motion count exceeded
 
 const unsigned long irrigationInterval = 1.5 * 24 * 60 * 60 * 1000; // 1.5 days in milliseconds (summer)
-const unsigned long sprinklersInterval = 24 * 60 * 60 * 1000;       // 1 day in milliseconds (summer)
+const unsigned long sprinklersInterval = 12 * 60 * 60 * 1000;       // 12 hours in milliseconds
 // const unsigned long irrigationInterval = 6UL * 24 * 60 * 60 * 1000; // 6 days in milliseconds (winter)
 // const unsigned long sprinklersInterval = 7UL * 24 * 60 * 60 * 1000; // 7 days in milliseconds (winter)
 // const unsigned long irrigationInterval = 25UL * 60 * 1000; // 12 minutes in milliseconds (for testing)
@@ -56,7 +56,7 @@ void loop()
         motionDetected = true;
         motionCount++;
 
-        if (!motionCountExceeded && motionCount > 5)
+        if (!motionCountExceeded && motionCount > 20)
         {
           motionCountExceeded = true;
           lastMotionTime = currentTime;
