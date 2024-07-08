@@ -11,8 +11,8 @@ void runIrrigation()
     turnOffAllSolenoidValves();
     turnOnSolenoidValve(0);
     turnOnSolenoidValve(1);
-    unsigned long sideGardenDelay = random(5, 10) * 60 * 1000; // Generate random delay between 5 and 10 minutes
-    delay(sideGardenDelay);                                    // Side garden random between 5 and 10 minutes
+    unsigned long sideGardenDelay = random(13, 15) * 60 * 1000; // Generate random delay between 5 and 10 minutes
+    delay(sideGardenDelay);                                     // Side garden random between 5 and 10 minutes
     turnOffAllSolenoidValves();
 }
 
@@ -21,8 +21,8 @@ void runSprinklers()
     turnOffAllSolenoidValves();
     turnOnSolenoidValve(0);
     turnOnSolenoidValve(3);
-    unsigned long sprinklerDelay = random(8, 10) * 60 * 1000; // Generate random delay between 5 and 10 minutes
-    delay(sprinklerDelay);                                    // Right Sprinkler random between 5 and 10 minutes
+    unsigned long sprinklerDelay = random(13, 15) * 60 * 1000; // Generate random delay between 5 and 10 minutes
+    delay(sprinklerDelay);                                     // Right Sprinkler random between 5 and 10 minutes
     turnOffAllSolenoidValves();
     turnOnSolenoidValve(0);
     turnOnSolenoidValve(4);
