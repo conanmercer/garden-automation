@@ -8,17 +8,20 @@ unsigned long lastMotionTime = 0; // Timestamp of the last motion detected
 int motionCount = 0;              // Counter for motion detections
 bool motionCountExceeded = false; // Flag to track if motion count exceeded
 
-const unsigned long irrigationInterval = 1 * 24 * 60 * 60 * 1000; // 1.5 days in milliseconds (summer)
-const unsigned long sprinklersInterval = 12 * 60 * 60 * 1000;     // 12 hours in milliseconds
+// Constants for water cycles
+const unsigned long irrigationInterval = 25 * 60 * 60 * 1000; // 25 hours in milliseconds
+// const unsigned long irrigationInterval = 10 * 1000;           // 10 seconds in milliseconds (testing)
+const unsigned long sprinklersInterval = 13 * 60 * 60 * 1000; // 13 hours in milliseconds
+// const unsigned long sprinklersInterval = 10 * 1000; // 10 seconds in milliseconds (testing)
 
 Scheduler scheduler(irrigationInterval, sprinklersInterval);
 PinInitializer pinInitializer;
 
-// Constants for garden light cycle
-const int gardenLightPin1 = 33;                          // Pin for garden light 1
-const int gardenLightPin2 = 32;                          // Pin for garden light 2
-const unsigned long intervalHigh = 3UL * 60 * 60 * 1000; // 3 hours in milliseconds
-const unsigned long intervalLow = 21UL * 60 * 60 * 1000; // 21 hours in milliseconds
+// Constants for garden light cycles
+const int gardenLightPins[] = {33, 32, 21}; // Pins for garden lights
+const int numGardenLights = sizeof(gardenLightPins) / sizeof(gardenLightPins[0]);
+const unsigned long intervalHigh = 2UL * 60 * 60 * 1000; // 2 hours in milliseconds
+const unsigned long intervalLow = 22UL * 60 * 60 * 1000; // 22 hours in milliseconds
 unsigned long previousMillis = 0;                        // Store the last time the lights were updated
 bool lightsAreOn = true;
 
@@ -38,10 +41,11 @@ void setup()
   randomSeed(analogRead(0));
 
   // Initialize garden lights
-  pinMode(gardenLightPin1, OUTPUT);
-  pinMode(gardenLightPin2, OUTPUT);
-  digitalWrite(gardenLightPin1, HIGH);
-  digitalWrite(gardenLightPin2, HIGH);
+  for (int i = 0; i < numGardenLights; i++)
+  {
+    pinMode(gardenLightPins[i], OUTPUT);
+    digitalWrite(gardenLightPins[i], HIGH); // Turn on lights initially
+  }
   previousMillis = millis();
 }
 
@@ -52,21 +56,15 @@ void loop()
 
   scheduler.run(currentTime);
 
-  // Manage the 3-hour on and 21-hour off cycle for garden lights
-  if (lightsAreOn && (currentTime - previousMillis >= intervalHigh))
+  // Manage the 2-hour on and 22-hour off cycle for garden lights
+  if ((currentTime - previousMillis >= (lightsAreOn ? intervalHigh : intervalLow)))
   {
-    // Turn lights off
-    digitalWrite(gardenLightPin1, LOW);
-    digitalWrite(gardenLightPin2, LOW);
-    lightsAreOn = false;
-    previousMillis = currentTime;
-  }
-  else if (!lightsAreOn && (currentTime - previousMillis >= intervalLow))
-  {
-    // Turn lights on
-    digitalWrite(gardenLightPin1, HIGH);
-    digitalWrite(gardenLightPin2, HIGH);
-    lightsAreOn = true;
+    // Toggle lights state
+    for (int i = 0; i < numGardenLights; i++)
+    {
+      digitalWrite(gardenLightPins[i], lightsAreOn ? LOW : HIGH);
+    }
+    lightsAreOn = !lightsAreOn;
     previousMillis = currentTime;
   }
 
@@ -103,6 +101,7 @@ void loop()
       else
       {
         motionControlledSprinkler(3); // Right Sprinkler
+        motionControlledSprinkler(8); // Back Right Sprinkler
       }
     }
   }
