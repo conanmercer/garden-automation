@@ -11,7 +11,7 @@ bool motionCountExceeded = false; // Flag to track if motion count exceeded
 // Constants for water cycles
 const unsigned long irrigationInterval = 25 * 60 * 60 * 1000; // 25 hours in milliseconds
 // const unsigned long irrigationInterval = 10 * 1000;           // 10 seconds in milliseconds (testing)
-const unsigned long sprinklersInterval = 13 * 60 * 60 * 1000; // 13 hours in milliseconds
+const unsigned long sprinklersInterval = 10 * 60 * 60 * 1000; // 10 hours in milliseconds
 // const unsigned long sprinklersInterval = 10 * 1000; // 10 seconds in milliseconds (testing)
 
 Scheduler scheduler(irrigationInterval, sprinklersInterval);
