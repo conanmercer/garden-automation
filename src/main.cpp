@@ -9,36 +9,31 @@ int motionCount = 0;              // Counter for motion detections
 bool motionCountExceeded = false; // Flag to track if motion count exceeded
 
 // Constants for water cycles
-const unsigned long irrigationInterval = 25 * 60 * 60 * 1000; // 25 hours in milliseconds
+const unsigned long irrigationInterval = 12 * 60 * 60 * 1000; // 12 hours in milliseconds
 // const unsigned long irrigationInterval = 10 * 1000;           // 10 seconds in milliseconds (testing)
-const unsigned long sprinklersInterval = 10 * 60 * 60 * 1000; // 10 hours in milliseconds
-// const unsigned long sprinklersInterval = 10 * 1000; // 10 seconds in milliseconds (testing)
 
-Scheduler scheduler(irrigationInterval, sprinklersInterval);
+Scheduler scheduler(irrigationInterval);
 PinInitializer pinInitializer;
 
 // Constants for garden light cycles
 const int gardenLightPins[] = {33, 32, 21}; // Pins for garden lights
 const int numGardenLights = sizeof(gardenLightPins) / sizeof(gardenLightPins[0]);
-const unsigned long intervalHigh = 2UL * 60 * 60 * 1000; // 2 hours in milliseconds
-const unsigned long intervalLow = 22UL * 60 * 60 * 1000; // 22 hours in milliseconds
-unsigned long previousMillis = 0;                        // Store the last time the lights were updated
+const unsigned long intervalHigh = 2 * 60 * 60 * 1000; // 2 hours in milliseconds
+const unsigned long intervalLow = 22 * 60 * 60 * 1000; // 22 hours in milliseconds
+unsigned long previousMillis = 0;                      // Store the last time the lights were updated
 bool lightsAreOn = true;
+const unsigned long ONE_MINUTE_MS = 60 * 1000; // 60,000 milliseconds (1 minute)
 
 void setup()
 {
   Serial.begin(115200);
   // Initialize scheduler
-  scheduler = Scheduler(irrigationInterval, sprinklersInterval);
+  scheduler = Scheduler(irrigationInterval);
   scheduler.setIrrigationInterval(irrigationInterval);
-  scheduler.setSprinklersInterval(sprinklersInterval);
 
   // Initialize pin configuration
   pinInitializer.setupSolenoidValvePins();
   pinInitializer.setupPIRSensorPins();
-
-  // Initialize random number generator with a seed
-  randomSeed(analogRead(0));
 
   // Initialize garden lights
   for (int i = 0; i < numGardenLights; i++)
@@ -57,7 +52,7 @@ void loop()
   scheduler.run(currentTime);
 
   // Manage the 2-hour on and 22-hour off cycle for garden lights
-  if ((currentTime - previousMillis >= (lightsAreOn ? intervalHigh : intervalLow)))
+  if ((currentTime - previousMillis - ONE_MINUTE_MS >= (lightsAreOn ? intervalHigh : intervalLow)))
   {
     // Toggle lights state
     for (int i = 0; i < numGardenLights; i++)
