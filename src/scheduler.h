@@ -14,7 +14,7 @@ private:
 
 public:
     // Constructor for Scheduler class
-    // Initializes the irrigation and sprinklers intervals
+    // Initializes the irrigation intervals
     Scheduler(unsigned long irrigationInterval) : irrigationInterval(irrigationInterval) {}
 
     void run(unsigned long currentTime)

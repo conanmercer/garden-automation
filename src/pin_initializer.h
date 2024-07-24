@@ -25,4 +25,13 @@ public:
             pinMode(PIR_SENSOR_PINS[i], INPUT_PULLDOWN);
         }
     }
+
+    // Function to set up light pins as OUTPUT
+    void setupLightPins()
+    {
+        for (int i = 0; i < NUM_LIGHTS; i++)
+        {
+            pinMode(LIGHT_PINS[i], OUTPUT);
+        }
+    }
 };

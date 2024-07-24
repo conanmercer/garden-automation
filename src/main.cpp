@@ -4,44 +4,43 @@
 #include "scheduler.h"
 #include "pin_initializer.h"
 
+// Motion Sensor
 unsigned long lastMotionTime = 0; // Timestamp of the last motion detected
 int motionCount = 0;              // Counter for motion detections
 bool motionCountExceeded = false; // Flag to track if motion count exceeded
 
-// Constants for water cycles
-const unsigned long irrigationInterval = 12 * 60 * 60 * 1000; // 12 hours in milliseconds
-// const unsigned long irrigationInterval = 10 * 1000;           // 10 seconds in milliseconds (testing)
-
+// Pin Config
 Scheduler scheduler(irrigationInterval);
 PinInitializer pinInitializer;
 
-// Constants for garden light cycles
-const int gardenLightPins[] = {33, 32, 21}; // Pins for garden lights
-const int numGardenLights = sizeof(gardenLightPins) / sizeof(gardenLightPins[0]);
-const unsigned long intervalHigh = 2 * 60 * 60 * 1000; // 2 hours in milliseconds
-const unsigned long intervalLow = 22 * 60 * 60 * 1000; // 22 hours in milliseconds
-unsigned long previousMillis = 0;                      // Store the last time the lights were updated
-bool lightsAreOn = true;
-const unsigned long ONE_MINUTE_MS = 60 * 1000; // 60,000 milliseconds (1 minute)
+// Lights
+bool lightsAreOn = false;
+unsigned long nextOnTime = 0;
+unsigned long nextOffTime = 0;
+unsigned long previousMillis = 0;
 
 void setup()
 {
   Serial.begin(115200);
+
   // Initialize scheduler
   scheduler = Scheduler(irrigationInterval);
   scheduler.setIrrigationInterval(irrigationInterval);
 
-  // Initialize pin configuration
+  // Initialize pin configurations
   pinInitializer.setupSolenoidValvePins();
   pinInitializer.setupPIRSensorPins();
+  pinInitializer.setupLightPins();
 
   // Initialize garden lights
-  for (int i = 0; i < numGardenLights; i++)
+  for (int i = 0; i < NUM_LIGHTS; i++)
   {
-    pinMode(gardenLightPins[i], OUTPUT);
-    digitalWrite(gardenLightPins[i], HIGH); // Turn on lights initially
+    digitalWrite(LIGHT_PINS[i], HIGH); // Turn on lights initially
   }
+
+  lightsAreOn = true;
   previousMillis = millis();
+  nextOffTime = previousMillis + lightsIntervalOn; // Schedule the first turn-off time
 }
 
 void loop()
@@ -52,15 +51,27 @@ void loop()
   scheduler.run(currentTime);
 
   // Manage the 2-hour on and 22-hour off cycle for garden lights
-  if ((currentTime - previousMillis - ONE_MINUTE_MS >= (lightsAreOn ? intervalHigh : intervalLow)))
+  if (lightsAreOn && (currentTime >= nextOffTime))
   {
-    // Toggle lights state
-    for (int i = 0; i < numGardenLights; i++)
+    // Turn lights off
+    for (int i = 0; i < NUM_LIGHTS; i++)
     {
-      digitalWrite(gardenLightPins[i], lightsAreOn ? LOW : HIGH);
+      digitalWrite(LIGHT_PINS[i], LOW);
     }
-    lightsAreOn = !lightsAreOn;
+    lightsAreOn = false;
     previousMillis = currentTime;
+    nextOnTime = currentTime + lightsIntervalOff - 60 * 1000UL; // Schedule next turn-on time 1 minute earlier
+  }
+  else if (!lightsAreOn && (currentTime >= nextOnTime))
+  {
+    // Turn lights on
+    for (int i = 0; i < NUM_LIGHTS; i++)
+    {
+      digitalWrite(LIGHT_PINS[i], HIGH);
+    }
+    lightsAreOn = true;
+    previousMillis = currentTime;
+    nextOffTime = currentTime + lightsIntervalOn;
   }
 
   // Check PIR sensor pins for motion
