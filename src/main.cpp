@@ -103,6 +103,7 @@ void loop()
       if (digitalRead(PIR_SENSOR_PINS[0]) == HIGH)
       {
         motionControlledSprinkler(4); // Middle Sprinkler
+        motionControlledSprinkler(5); // Left Sprinkler
       }
       else
       {

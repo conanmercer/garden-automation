@@ -14,7 +14,7 @@ const int LIGHT_PINS[] = {33, 32, 21};
 const int NUM_LIGHTS = sizeof(LIGHT_PINS) / sizeof(LIGHT_PINS[0]);
 
 // Constants for Water Cycles
-const unsigned long irrigationInterval = 12 * 60 * 60 * 1000; // 12 hours in milliseconds
+const unsigned long irrigationInterval = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 // const unsigned long irrigationInterval = 10 * 1000;           // 10 seconds in milliseconds (testing)
 
 // Lights Intervals
