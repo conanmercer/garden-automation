@@ -50,7 +50,7 @@ void loop()
 
   scheduler.run(currentTime);
 
-  // Manage the 2-hour on and 22-hour off cycle for garden lights
+  // Manage the 1-hour on and 23-hour off cycle for garden lights
   if (lightsAreOn && (currentTime >= nextOffTime))
   {
     // Turn lights off
@@ -85,7 +85,7 @@ void loop()
         motionDetected = true;
         motionCount++;
 
-        if (!motionCountExceeded && motionCount > 20)
+        if (!motionCountExceeded && motionCount > 5)
         {
           motionCountExceeded = true;
           lastMotionTime = currentTime;
