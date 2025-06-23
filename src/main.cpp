@@ -19,6 +19,11 @@ unsigned long nextOnTime = 0;
 unsigned long nextOffTime = 0;
 unsigned long previousMillis = 0;
 
+// Motion
+const unsigned long minMotionDuration = 2000;         // 2 seconds
+unsigned long motionStartTimes[3] = {0, 0, 0};        // Track when motion started per PIR sensor
+bool motionAlreadyCounted[3] = {false, false, false}; // prevent double-counting during continuous motion
+
 void setup()
 {
   Serial.begin(115200);
@@ -40,7 +45,12 @@ void setup()
 
   lightsAreOn = true;
   previousMillis = millis();
-  nextOffTime = previousMillis + lightsIntervalOn; // Schedule the first turn-off time
+
+  nextOnTime = millis() + irrigationInterval - 2000UL; // 2 seconds before irrigation
+  nextOffTime = nextOnTime + lightsIntervalOn;
+
+  runIrrigation();
+  scheduler.setLastIrrigationRun(millis());
 }
 
 void loop()
@@ -50,7 +60,7 @@ void loop()
 
   scheduler.run(currentTime);
 
-  // Manage the 1-hour on and 23-hour off cycle for garden lights
+  // Handle automated light scheduling
   if (lightsAreOn && (currentTime >= nextOffTime))
   {
     // Turn lights off
@@ -60,7 +70,6 @@ void loop()
     }
     lightsAreOn = false;
     previousMillis = currentTime;
-    nextOnTime = currentTime + lightsIntervalOff - 60 * 1000UL; // Schedule next turn-on time 1 minute earlier
   }
   else if (!lightsAreOn && (currentTime >= nextOnTime))
   {
@@ -72,43 +81,58 @@ void loop()
     lightsAreOn = true;
     previousMillis = currentTime;
     nextOffTime = currentTime + lightsIntervalOn;
+
+    // Update next light cycle to happen 2 seconds before next irrigation
+    nextOnTime = currentTime + irrigationInterval - 2000UL;
   }
 
-  // Check PIR sensor pins for motion
+  // Check PIR sensor pins for sustained motion (per sensor)
   if (!motionCountExceeded)
   {
-    // Check PIR sensor pins for motion
     for (int i = 0; i < 3; i++)
     {
-      if (digitalRead(PIR_SENSOR_PINS[i]) == HIGH)
-      {
-        motionDetected = true;
-        motionCount++;
+      int sensorValue = digitalRead(PIR_SENSOR_PINS[i]);
 
-        if (!motionCountExceeded && motionCount > 5)
+      if (sensorValue == HIGH)
+      {
+        if (motionStartTimes[i] == 0)
         {
-          motionCountExceeded = true;
-          lastMotionTime = currentTime;
+          motionStartTimes[i] = currentTime; // Start timing
         }
-      }
-    }
-  }
+        else if (!motionAlreadyCounted[i] && (currentTime - motionStartTimes[i] >= minMotionDuration))
+        {
+          // Valid motion sustained on sensor i
+          motionDetected = true;
+          motionCount++;
+          motionAlreadyCounted[i] = true;
 
-  // Process motion detection
-  if (motionDetected)
-  {
-    if (!motionCountExceeded)
-    {
-      // Within the allowed limit
-      if (digitalRead(PIR_SENSOR_PINS[0]) == HIGH)
-      {
-        motionControlledSprinkler(4); // Middle Sprinkler
-        motionControlledSprinkler(5); // Left Sprinkler
+          if (!motionCountExceeded && motionCount > 30)
+          {
+            motionCountExceeded = true;
+            lastMotionTime = currentTime;
+          }
+
+          // Trigger sprinklers based on sensor index
+          switch (i)
+          {
+          case 0:
+            motionControlledSprinkler(4); // Middle
+            motionControlledSprinkler(5); // Left
+            break;
+          case 1:
+            motionControlledSprinkler(3); // Right
+            break;
+          case 2:
+            motionControlledSprinkler(8); // Back Right
+            break;
+          }
+        }
       }
       else
       {
-        motionControlledSprinkler(3); // Right Sprinkler
-        motionControlledSprinkler(8); // Back Right Sprinkler
+        // Reset if motion stops
+        motionStartTimes[i] = 0;
+        motionAlreadyCounted[i] = false;
       }
     }
   }

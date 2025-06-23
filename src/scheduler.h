@@ -1,11 +1,3 @@
-// Scheduler class handles scheduling of irrigation
-// operations based on predefined intervals
-
-#include <Arduino.h>
-#include "solenoids.h"
-#include "irrigation.h"
-#include "constants.h"
-
 class Scheduler
 {
 private:
@@ -13,8 +5,6 @@ private:
     unsigned long irrigationInterval;
 
 public:
-    // Constructor for Scheduler class
-    // Initializes the irrigation intervals
     Scheduler(unsigned long irrigationInterval) : irrigationInterval(irrigationInterval) {}
 
     void run(unsigned long currentTime)
@@ -30,5 +20,10 @@ public:
     void setIrrigationInterval(unsigned long interval)
     {
         irrigationInterval = interval;
+    }
+
+    void setLastIrrigationRun(unsigned long time)
+    {
+        lastIrrigationRun = time;
     }
 };
