@@ -43,11 +43,12 @@ void setup()
     digitalWrite(LIGHT_PINS[i], HIGH); // Turn on lights initially
   }
 
+  unsigned long currentTime = millis();
   lightsAreOn = true;
-  previousMillis = millis();
+  previousMillis = currentTime;
 
-  nextOnTime = millis() + irrigationInterval - 2000UL; // 2 seconds before irrigation
-  nextOffTime = nextOnTime + lightsIntervalOn;
+  nextOffTime = currentTime + lightsIntervalOn;           // Lights turn off in 3 hours
+  nextOnTime = currentTime + irrigationInterval - 2000UL; // Next lights-on cycle before next irrigation
 
   runIrrigation();
   scheduler.setLastIrrigationRun(millis());
