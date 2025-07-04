@@ -50,7 +50,9 @@ void setup()
   nextOffTime = currentTime + lightsIntervalOn;           // Lights turn off in 3 hours
   nextOnTime = currentTime + irrigationInterval - 2000UL; // Next lights-on cycle before next irrigation
 
-  scheduler.setLastIrrigationRun(millis() - irrigationInterval); // force scheduler to run irrigation immediately
+  // Run irrigation now, then mark the current time as the last run
+  runIrrigation();
+  scheduler.setLastIrrigationRun(currentTime);
 }
 
 void loop()

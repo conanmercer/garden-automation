@@ -10,7 +10,7 @@ const int PIR_SENSOR_PINS[] = {27, 26, 25}; // Left, Middle, Right
 const int NUM_PIR_SENSORS = sizeof(PIR_SENSOR_PINS) / sizeof(PIR_SENSOR_PINS[0]);
 
 // Lights Pins
-const int LIGHT_PINS[] = {33, 32, 21};
+const int LIGHT_PINS[] = {33, 32, 21, 17};
 const int NUM_LIGHTS = sizeof(LIGHT_PINS) / sizeof(LIGHT_PINS[0]);
 
 // Constants for Water Cycles
