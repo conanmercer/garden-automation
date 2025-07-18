@@ -122,6 +122,7 @@ void loop()
             motionControlledSprinkler(5); // Left
             break;
           case 1:
+            motionControlledSprinkler(9); // MiddleRight
             motionControlledSprinkler(3); // Right
             break;
           case 2:

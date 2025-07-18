@@ -30,15 +30,18 @@ void runIrrigation()
 
     // runSprinklers
 
-    activateSolenoids(3);
-    unsigned long sprinklerDelay = 14 * 60 * 1000; // Fixed delay of 14 minutes
-    delay(sprinklerDelay);                         // Right Sprinkler
-
     activateSolenoids(8);
-    delay(sprinklerDelay); // Back Right Sprinkler
+    unsigned long sprinklerDelay = 14 * 60 * 1000; // Fixed delay of 14 minutes
+    delay(sprinklerDelay);                         // Back Right Sprinkler
+
+    activateSolenoids(3);
+    delay(sprinklerDelay); // Right Sprinkler
 
     activateSolenoids(4);
-    delay(sprinklerDelay); // Middle Sprinkler
+    delay(sprinklerDelay); // Right Middle Sprinkler
+
+    activateSolenoids(9);
+    delay(sprinklerDelay); // Left Middle Sprinkler
 
     activateSolenoids(5);
     delay(sprinklerDelay); // Left Sprinkler
