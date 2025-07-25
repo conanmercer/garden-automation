@@ -3,6 +3,7 @@
 #include "irrigation.h"
 #include "scheduler.h"
 #include "pin_initializer.h"
+#include "constants.h"
 
 // Motion Sensor
 unsigned long lastMotionTime = 0; // Timestamp of the last motion detected
@@ -24,9 +25,19 @@ const unsigned long minMotionDuration = 2000;         // 2 seconds
 unsigned long motionStartTimes[3] = {0, 0, 0};        // Track when motion started per PIR sensor
 bool motionAlreadyCounted[3] = {false, false, false}; // prevent double-counting during continuous motion
 
+// Voltage reading helper
+float readVoltage()
+{
+  int adc = analogRead(VOLTAGE_SENSOR_PIN);
+  float vin = (adc * VREF / 4095.0) * (R1 + R2) / R2 * VOLTAGE_CORRECTION;
+  Serial.printf("Input Voltage = %.2fV\n", vin);
+  return vin;
+}
+
 void setup()
 {
   Serial.begin(115200);
+  analogReadResolution(12); // Set ADC resolution for accurate readings
 
   // Initialize scheduler
   scheduler = Scheduler(irrigationInterval);
@@ -37,18 +48,32 @@ void setup()
   pinInitializer.setupPIRSensorPins();
   pinInitializer.setupLightPins();
 
-  // Initialize garden lights
-  for (int i = 0; i < NUM_LIGHTS; i++)
-  {
-    digitalWrite(LIGHT_PINS[i], HIGH); // Turn on lights initially
-  }
-
   unsigned long currentTime = millis();
-  lightsAreOn = true;
-  previousMillis = currentTime;
+  float vin = readVoltage(); // Read voltage at startup
 
-  nextOffTime = currentTime + lightsIntervalOn;           // Lights turn off in 3 hours
-  nextOnTime = currentTime + irrigationInterval - 2000UL; // Next lights-on cycle before next irrigation
+  if (vin > MIN_REQUIRED_VOLTAGE)
+  {
+    // Turn on lights initially only if voltage is sufficient
+    for (int i = 0; i < NUM_LIGHTS; i++)
+    {
+      digitalWrite(LIGHT_PINS[i], HIGH);
+    }
+    lightsAreOn = true;
+    previousMillis = currentTime;
+    nextOffTime = currentTime + lightsIntervalOn;           // Lights turn off in 3 hours
+    nextOnTime = currentTime + irrigationInterval - 2000UL; // Next lights-on cycle before next irrigation
+  }
+  else
+  {
+    // Keep lights off and schedule next on time anyway
+    for (int i = 0; i < NUM_LIGHTS; i++)
+    {
+      digitalWrite(LIGHT_PINS[i], LOW);
+    }
+    lightsAreOn = false;
+    nextOffTime = 0; // No off time needed if lights are off
+    nextOnTime = currentTime + irrigationInterval - 2000UL;
+  }
 
   // Run irrigation now, then mark the current time as the last run
   runIrrigation();
@@ -75,17 +100,26 @@ void loop()
   }
   else if (!lightsAreOn && (currentTime >= nextOnTime))
   {
-    // Turn lights on
-    for (int i = 0; i < NUM_LIGHTS; i++)
+    float vin = readVoltage();
+    if (vin > MIN_REQUIRED_VOLTAGE)
     {
-      digitalWrite(LIGHT_PINS[i], HIGH);
-    }
-    lightsAreOn = true;
-    previousMillis = currentTime;
-    nextOffTime = currentTime + lightsIntervalOn;
+      // Turn lights on
+      for (int i = 0; i < NUM_LIGHTS; i++)
+      {
+        digitalWrite(LIGHT_PINS[i], HIGH);
+      }
+      lightsAreOn = true;
+      previousMillis = currentTime;
+      nextOffTime = currentTime + lightsIntervalOn;
 
-    // Update next light cycle to happen 2 seconds before next irrigation
-    nextOnTime = currentTime + irrigationInterval - 2000UL;
+      // Update next light cycle to happen 2 seconds before next irrigation
+      nextOnTime = currentTime + irrigationInterval - 2000UL;
+    }
+    else
+    {
+      // Skip light activation, retry in next cycle
+      nextOnTime = currentTime + irrigationInterval - 2000UL;
+    }
   }
 
   // Check PIR sensor pins for sustained motion (per sensor)
@@ -140,7 +174,7 @@ void loop()
     }
   }
 
-  // Check if 1 hour has passed since motion count exceeded 20
+  // Reset motion count after 1 hour
   if (motionCountExceeded && currentTime - lastMotionTime >= 3600000)
   {
     motionCount = 0;

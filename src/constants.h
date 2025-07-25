@@ -20,4 +20,12 @@ const unsigned long irrigationInterval = 24 * 60 * 60 * 1000; // 24 hours in mil
 const unsigned long lightsIntervalOn = 3 * 60 * 60 * 1000UL;   // 3 hours
 const unsigned long lightsIntervalOff = 23 * 60 * 60 * 1000UL; // 23 hours in milliseconds
 
+// Voltage Sensor Pin & Constants
+const int VOLTAGE_SENSOR_PIN = 35;
+const float R1 = 30000.0;
+const float R2 = 7500.0;
+const float VREF = 3.3;
+const float VOLTAGE_CORRECTION = 11.34 / 10.51;
+const float MIN_REQUIRED_VOLTAGE = 12.5;
+
 #endif // CONSTANTS_H
