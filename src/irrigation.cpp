@@ -12,12 +12,12 @@ void activateSolenoids(int additionalValve)
 void runIrrigation()
 {
     activateSolenoids(2);
-    unsigned long terraceDelay = 45 * 1000; // Fixed delay of 90 seconds
-    delay(terraceDelay);                    // Terrace random delay between 60 and 90 seconds
+    unsigned long terraceDelay = 2 * 60 * 1000;
+    delay(terraceDelay);
 
     activateSolenoids(1);
-    unsigned long gardenDelay = 5 * 60 * 1000; // Fixed delay of 10 minutes
-    delay(gardenDelay);                        // Side Garden lower
+    unsigned long gardenDelay = 5 * 60 * 1000;
+    delay(gardenDelay); // Side Garden lower
 
     // Uncomment and modify if needed
     // activateSolenoids(6);

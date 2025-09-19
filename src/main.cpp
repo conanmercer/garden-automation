@@ -18,6 +18,7 @@ PinInitializer pinInitializer;
 bool lightsAreOn = false;
 unsigned long nextOnTime = 0;
 unsigned long nextOffTime = 0;
+unsigned long nextIrrigationTime = 0;
 unsigned long previousMillis = 0;
 
 // Motion
@@ -60,7 +61,8 @@ void setup()
     }
     lightsAreOn = true;
     previousMillis = currentTime;
-    nextOffTime = currentTime + lightsIntervalOn;           // Lights turn off in 3 hours
+    nextOffTime = currentTime + lightsIntervalOn;
+    nextIrrigationTime = currentTime + 43200000UL;
     nextOnTime = currentTime + irrigationInterval - 2000UL; // Next lights-on cycle before next irrigation
   }
   else
@@ -71,13 +73,10 @@ void setup()
       digitalWrite(LIGHT_PINS[i], LOW);
     }
     lightsAreOn = false;
-    nextOffTime = 0; // No off time needed if lights are off
+    nextOffTime = 0;        // No off time needed if lights are off
+    nextIrrigationTime = 0; // No irrigation scheduled if lights didn't turn on
     nextOnTime = currentTime + irrigationInterval - 2000UL;
   }
-
-  // Run irrigation now, then mark the current time as the last run
-  runIrrigation();
-  scheduler.setLastIrrigationRun(currentTime);
 }
 
 void loop()
@@ -85,7 +84,13 @@ void loop()
   unsigned long currentTime = millis();
   bool motionDetected = false;
 
-  scheduler.run(currentTime);
+  // Check if it's time for irrigation (12 hours after lights turned on)
+  if (nextIrrigationTime > 0 && currentTime >= nextIrrigationTime)
+  {
+    runIrrigation();
+    scheduler.setLastIrrigationRun(currentTime);
+    nextIrrigationTime = 0; // Reset until next light cycle
+  }
 
   // Handle automated light scheduling
   if (lightsAreOn && (currentTime >= nextOffTime))
@@ -111,6 +116,7 @@ void loop()
       lightsAreOn = true;
       previousMillis = currentTime;
       nextOffTime = currentTime + lightsIntervalOn;
+      nextIrrigationTime = currentTime + 43200000UL; // Schedule irrigation 12 hours from now
 
       // Update next light cycle to happen 2 seconds before next irrigation
       nextOnTime = currentTime + irrigationInterval - 2000UL;
