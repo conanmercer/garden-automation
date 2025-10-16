@@ -62,8 +62,8 @@ void setup()
     lightsAreOn = true;
     previousMillis = currentTime;
     nextOffTime = currentTime + lightsIntervalOn;
-    nextIrrigationTime = currentTime + 43200000UL;
-    nextOnTime = currentTime + irrigationInterval - 2000UL; // Next lights-on cycle before next irrigation
+    nextIrrigationTime = currentTime + initialIrrigationDelay;
+    nextOnTime = currentTime + lightsCycleInterval; // Next lights in 24 hours
   }
   else
   {
@@ -73,9 +73,9 @@ void setup()
       digitalWrite(LIGHT_PINS[i], LOW);
     }
     lightsAreOn = false;
-    nextOffTime = 0;        // No off time needed if lights are off
-    nextIrrigationTime = 0; // No irrigation scheduled if lights didn't turn on
-    nextOnTime = currentTime + irrigationInterval - 2000UL;
+    nextOffTime = 0;
+    nextIrrigationTime = 0;
+    nextOnTime = currentTime + lightsCycleInterval; // Try again in 24 hours
   }
 }
 
@@ -84,12 +84,12 @@ void loop()
   unsigned long currentTime = millis();
   bool motionDetected = false;
 
-  // Check if it's time for irrigation (12 hours after lights turned on)
+  // Check if it's time for irrigation
   if (nextIrrigationTime > 0 && currentTime >= nextIrrigationTime)
   {
     runIrrigation();
     scheduler.setLastIrrigationRun(currentTime);
-    nextIrrigationTime = 0; // Reset until next light cycle
+    nextIrrigationTime = currentTime + irrigationInterval; // Next irrigation
   }
 
   // Handle automated light scheduling
@@ -116,15 +116,12 @@ void loop()
       lightsAreOn = true;
       previousMillis = currentTime;
       nextOffTime = currentTime + lightsIntervalOn;
-      nextIrrigationTime = currentTime + 43200000UL; // Schedule irrigation 12 hours from now
-
-      // Update next light cycle to happen 2 seconds before next irrigation
-      nextOnTime = currentTime + irrigationInterval - 2000UL;
+      nextOnTime = currentTime + lightsCycleInterval; // Next lights in 24 hours
     }
     else
     {
-      // Skip light activation, retry in next cycle
-      nextOnTime = currentTime + irrigationInterval - 2000UL;
+      // Skip light activation, retry in 24 hours
+      nextOnTime = currentTime + lightsCycleInterval;
     }
   }
 

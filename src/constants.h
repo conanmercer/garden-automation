@@ -14,11 +14,14 @@ const int LIGHT_PINS[] = {33, 32, 21, 17};
 const int NUM_LIGHTS = sizeof(LIGHT_PINS) / sizeof(LIGHT_PINS[0]);
 
 // Constants for Water Cycles
-const unsigned long irrigationInterval = 24 * 60 * 60 * 1000; // 24 hours in milliseconds (summer)
+// const unsigned long irrigationInterval = 24 * 60 * 60 * 1000; // 24 hours in milliseconds (summer)
+const unsigned long irrigationInterval = 7UL * 24UL * 60UL * 60UL * 1000UL; // 1 week in milliseconds (winter)
+const unsigned long initialIrrigationDelay = 12 * 60 * 60 * 1000UL;         // 12 hours after system boot
 
 // Lights Intervals
-const unsigned long lightsIntervalOn = 3 * 60 * 60 * 1000UL;   // 3 hours
-const unsigned long lightsIntervalOff = 23 * 60 * 60 * 1000UL; // 23 hours in milliseconds
+const unsigned long lightsIntervalOn = 3 * 60 * 60 * 1000UL;     // 3 hours
+const unsigned long lightsIntervalOff = 21 * 60 * 60 * 1000UL;   // 21 hours (24 - 3 = 21)
+const unsigned long lightsCycleInterval = 24 * 60 * 60 * 1000UL; // 24 hours for daily light cycle
 
 // Voltage Sensor Pin & Constants
 const int VOLTAGE_SENSOR_PIN = 35;
@@ -26,6 +29,6 @@ const float R1 = 30000.0;
 const float R2 = 7500.0;
 const float VREF = 3.3;
 const float VOLTAGE_CORRECTION = 11.34 / 10.51;
-const float MIN_REQUIRED_VOLTAGE = 12.5;
+const float MIN_REQUIRED_VOLTAGE = 12.6;
 
 #endif // CONSTANTS_H
