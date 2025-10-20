@@ -29,6 +29,6 @@ const float R1 = 30000.0;
 const float R2 = 7500.0;
 const float VREF = 3.3;
 const float VOLTAGE_CORRECTION = 11.34 / 10.51;
-const float MIN_REQUIRED_VOLTAGE = 12.6;
+const float MIN_REQUIRED_VOLTAGE = 11.9;
 
 #endif // CONSTANTS_H

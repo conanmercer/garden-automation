@@ -92,6 +92,30 @@ void loop()
     nextIrrigationTime = currentTime + irrigationInterval; // Next irrigation
   }
 
+  // Check voltage level while lights are on
+  if (lightsAreOn)
+  {
+    // Check voltage every minute (or at another appropriate interval)
+    if (currentTime - previousMillis >= 60000)
+    {
+      float vin = readVoltage();
+      previousMillis = currentTime;
+
+      // If voltage drops below minimum required, turn lights off
+      if (vin < MIN_REQUIRED_VOLTAGE)
+      {
+        // Turn lights off to conserve power
+        for (int i = 0; i < NUM_LIGHTS; i++)
+        {
+          digitalWrite(LIGHT_PINS[i], LOW);
+        }
+        lightsAreOn = false;
+        Serial.println("Voltage too low, lights turned off to conserve power");
+        // Keep the next scheduled on time
+      }
+    }
+  }
+
   // Handle automated light scheduling
   if (lightsAreOn && (currentTime >= nextOffTime))
   {
