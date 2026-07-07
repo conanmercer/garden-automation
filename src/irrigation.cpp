@@ -12,7 +12,7 @@ void activateSolenoids(int additionalValve)
 void runIrrigation()
 {
     activateSolenoids(2);
-    unsigned long terraceDelay = 1 * 60 * 1000;
+    unsigned long terraceDelay = 2 * 60 * 1000;
     delay(terraceDelay);
 
     activateSolenoids(1);
@@ -31,7 +31,7 @@ void runIrrigation()
     // runSprinklers
 
     activateSolenoids(8);
-    unsigned long sprinklerDelay = 14 * 60 * 1000; // Fixed delay of 14 minutes
+    unsigned long sprinklerDelay = 30 * 60 * 1000; // Fixed delay of 30 minutes
     delay(sprinklerDelay);                         // Back Right Sprinkler
 
     activateSolenoids(3);

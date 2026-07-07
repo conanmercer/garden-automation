@@ -52,7 +52,7 @@ void setup()
   unsigned long currentTime = millis();
   float vin = readVoltage(); // Read voltage at startup
 
-  if (vin > MIN_REQUIRED_VOLTAGE)
+  if (!LIGHTS_DISABLED && vin > MIN_REQUIRED_VOLTAGE)
   {
     // Turn on lights initially only if voltage is sufficient
     for (int i = 0; i < NUM_LIGHTS; i++)
@@ -74,7 +74,7 @@ void setup()
     }
     lightsAreOn = false;
     nextOffTime = 0;
-    nextIrrigationTime = 0;
+    nextIrrigationTime = currentTime + initialIrrigationDelay;
     nextOnTime = currentTime + lightsCycleInterval; // Try again in 24 hours
   }
 }
@@ -130,7 +130,7 @@ void loop()
   else if (!lightsAreOn && (currentTime >= nextOnTime))
   {
     float vin = readVoltage();
-    if (vin > MIN_REQUIRED_VOLTAGE)
+    if (!LIGHTS_DISABLED && vin > MIN_REQUIRED_VOLTAGE)
     {
       // Turn lights on
       for (int i = 0; i < NUM_LIGHTS; i++)
@@ -150,61 +150,61 @@ void loop()
   }
 
   // Check PIR sensor pins for sustained motion (per sensor)
-  if (!motionCountExceeded)
-  {
-    for (int i = 0; i < 3; i++)
-    {
-      int sensorValue = digitalRead(PIR_SENSOR_PINS[i]);
+  // if (!motionCountExceeded)
+  // {
+  //   for (int i = 0; i < 3; i++)
+  //   {
+  //     int sensorValue = digitalRead(PIR_SENSOR_PINS[i]);
 
-      if (sensorValue == HIGH)
-      {
-        if (motionStartTimes[i] == 0)
-        {
-          motionStartTimes[i] = currentTime; // Start timing
-        }
-        else if (!motionAlreadyCounted[i] && (currentTime - motionStartTimes[i] >= minMotionDuration))
-        {
-          // Valid motion sustained on sensor i
-          motionDetected = true;
-          motionCount++;
-          motionAlreadyCounted[i] = true;
+  //     if (sensorValue == HIGH)
+  //     {
+  //       if (motionStartTimes[i] == 0)
+  //       {
+  //         motionStartTimes[i] = currentTime; // Start timing
+  //       }
+  //       else if (!motionAlreadyCounted[i] && (currentTime - motionStartTimes[i] >= minMotionDuration))
+  //       {
+  //         // Valid motion sustained on sensor i
+  //         motionDetected = true;
+  //         motionCount++;
+  //         motionAlreadyCounted[i] = true;
 
-          if (!motionCountExceeded && motionCount > 30)
-          {
-            motionCountExceeded = true;
-            lastMotionTime = currentTime;
-          }
+  //         if (!motionCountExceeded && motionCount > 30)
+  //         {
+  //           motionCountExceeded = true;
+  //           lastMotionTime = currentTime;
+  //         }
 
-          // Trigger sprinklers based on sensor index
-          switch (i)
-          {
-          case 0:
-            motionControlledSprinkler(4); // Middle
-            motionControlledSprinkler(5); // Left
-            break;
-          case 1:
-            motionControlledSprinkler(9); // MiddleRight
-            motionControlledSprinkler(3); // Right
-            break;
-          case 2:
-            motionControlledSprinkler(8); // Back Right
-            break;
-          }
-        }
-      }
-      else
-      {
-        // Reset if motion stops
-        motionStartTimes[i] = 0;
-        motionAlreadyCounted[i] = false;
-      }
-    }
-  }
+  //         // Trigger sprinklers based on sensor index
+  //         switch (i)
+  //         {
+  //         case 0:
+  //           motionControlledSprinkler(4); // Middle
+  //           motionControlledSprinkler(5); // Left
+  //           break;
+  //         case 1:
+  //           motionControlledSprinkler(9); // MiddleRight
+  //           motionControlledSprinkler(3); // Right
+  //           break;
+  //         case 2:
+  //           motionControlledSprinkler(8); // Back Right
+  //           break;
+  //         }
+  //       }
+  //     }
+  //     else
+  //     {
+  //       // Reset if motion stops
+  //       motionStartTimes[i] = 0;
+  //       motionAlreadyCounted[i] = false;
+  //     }
+  //   }
+  // }
 
-  // Reset motion count after 1 hour
-  if (motionCountExceeded && currentTime - lastMotionTime >= 3600000)
-  {
-    motionCount = 0;
-    motionCountExceeded = false;
-  }
+  // // Reset motion count after 1 hour
+  // if (motionCountExceeded && currentTime - lastMotionTime >= 3600000)
+  // {
+  //   motionCount = 0;
+  //   motionCountExceeded = false;
+  // }
 }
